@@ -3,436 +3,559 @@
 //=============================================================================
 
 /*:
- * @plugindesc (v1.6) Sistema dinámico de tempo. 
- * @author Moghunter
+ * @plugindesc (v1.6)[v1.3]  地图UI - 时间系统
+ * @author Moghunter （拾贝猫、Drill_up翻译）
  *
- * @param -> MAIN <<<<<<<<<<<<<<<<<<<<<<<
+ * @param ---系统---
  * @desc
- *  
- * @param Active Time
- * @desc Ativar o sistema de tempo em tempo real.
- * @default true
- * @type boolean
- * @parent -> MAIN <<<<<<<<<<<<<<<<<<<<<<<
  *
- * @param Stop During EventRunning
- * @desc Parar o sistema ativo durante as cenas evento.
- * @default true
+ * @param 是否默认运行
+ * @parent ---系统---
  * @type boolean
- * @parent -> MAIN <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param Stop During Dialogs
- * @desc Parar o sistema ativo durante os dialogos.
+ * @on 运行
+ * @off 不运行
+ * @desc true - 运行，false - 不运行
+ * 游戏开始后默认运行系统时间。
  * @default true
- * @type boolean
- * @parent -> MAIN <<<<<<<<<<<<<<<<<<<<<<<
  *
- * @param Time Speed
- * @desc Definição da velocidade do tempo.
- * 1 - 3000
+ * @param 执行事件时是否停止
+ * @parent ---系统---
+ * @type boolean
+ * @on 停止
+ * @off 不停止
+ * @desc true - 停止，false - 不停止
+ * 只要不是并行处理的事件运行就停止时间流动。
+ * @default true  
+ *
+ * @param 对话时是否停止
+ * @parent ---系统---
+ * @type boolean
+ * @on 停止
+ * @off 不停止
+ * @desc true - 停止，false - 不停止
+ * 对话是包含于执行事件的，如果执行事件停止，则对话也会停止时间。
+ * @default true
+ *
+ * @param 时间流动速度
+ * @parent ---系统---
+ * @type number
+ * @min 1
+ * @max 3000
+ * @desc 单位帧。设置60，即实际1秒相当于游戏的60帧（1秒）。
+ * 设置120，即实际1秒相当于游戏的120帧（2秒）。最大3000。
  * @default 120
- * @parent -> MAIN <<<<<<<<<<<<<<<<<<<<<<<
  *
- * @param Tint Screen
- * @desc Ativar a tonalidade do tempo.
- * @default true
+ * @param 是否使用色调变换
+ * @parent ---系统---
  * @type boolean
- * @parent -> MAIN <<<<<<<<<<<<<<<<<<<<<<<
+ * @on 使用
+ * @off 不使用
+ * @desc true - 使用，false - 不使用
+ * 不同的时间，游戏画面色调会变换。
+ * @default true   
  *
- * @param Transition Speed
- * @desc Definição da velocidade de transição entre as fases do dia.
+ * @param 色调变换速度
+ * @parent ---系统---
+ * @desc 游戏画面色调变换的时间，单位帧。（1秒60帧）
  * @default 160
- * @parent -> MAIN <<<<<<<<<<<<<<<<<<<<<<<
  *
- * @param
- * 
- * @param -> TERMS <<<<<<<<<<<<<<<<<<<<<<<
- * @desc
- *  
- * @param Day Week Names
- * @desc Definição do nome dos dias da semana.
- * @default Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday
- * @parent -> TERMS <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param Season Names
- * @desc Definição do nome das estações do ano.
- * @default Spring,Summer,Fall,Winter 
- * @parent -> TERMS <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param Month Names
- * @desc Definição do nome dos meses do ano.
- * @default January,February,March,April,May,June,July,August,September,October,November,December
- * @parent -> TERMS <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param Time Word
- * @desc Definição da palavra tempo.
- * @default Time
- * @parent -> TERMS <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param Day Word
- * @desc Definição da palavra dia.
- * @default Day
- * @parent -> TERMS <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param Day Week Word
- * @desc Definição da palavra dia da semana.
- * @default Day of Week
- * @parent -> TERMS <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param Month Word
- * @desc Definição da palavra mês.
- * @default Month
- * @parent -> TERMS <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param Season Word
- * @desc Definição da palavra estação.
- * @default Season
- * @parent -> TERMS <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param Year Word
- * @desc Definição da palavra ano.
- * @default Year
- * @parent -> TERMS <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param Play Time Word
- * @desc Definição da palavra tempo de jogo.
- * @default Play Time
- * @parent -> TERMS <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param
- * 
- * @param -> SWITCHES <<<<<<<<<<<<<<<<<<<<<<<
+ * @param ---用语---
  * @desc
  *
- * @param Dawn Switch ID
- * @desc Definição da Switch correspondente ao alvorecer. 
+ * @param 星期名
+ * @parent ---用语---
+ * @type text[]
+ * @desc 菜单中，显示表示星期含义的文字。
+ * 顺序为：周日,周一,周二,周三,周四,周五,周六。
+ * @default ["周日","周一","周二","周三","周四","周五","周六"]
+ *
+ * @param 季节名
+ * @parent ---用语---
+ * @type text[]
+ * @desc 菜单中，显示表示季节含义的文字。
+ * @default ["春","夏","秋","冬"]
+ *
+ * @param 月份名
+ * @parent ---用语---
+ * @type text[]
+ * @desc 菜单中，显示表示月份含义的文字。
+ * @default ["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"]
+ *
+ * @param 用语-时间
+ * @parent ---用语---
+ * @desc 菜单中，显示表示"时间"含义的文字。
+ * @default 时间
+ *
+ * @param 用语-星期
+ * @parent ---用语---
+ * @desc 菜单中，显示表示"星期"含义的文字。
+ * @default 星期
+ *
+ * @param 用语-季节
+ * @parent ---用语---
+ * @desc 菜单中，显示表示"季节"含义的文字。
+ * @default 季节
+ *
+ * @param 用语-日
+ * @parent ---用语---
+ * @desc 菜单中，显示表示"日期"含义的文字。
+ * @default 日
+ *
+ * @param 用语-月
+ * @parent ---用语---
+ * @desc 菜单中，显示表示"月"含义的文字。
+ * @default 月
+ *
+ * @param 用语-年
+ * @parent ---用语---
+ * @desc 菜单中，显示表示"年"含义的文字。
+ * @default 年
+ *
+ * @param 用语-游戏时长
+ * @parent ---用语---
+ * @desc 菜单中，显示表示"游戏时长"玩家一共花了多少时间的文字。
+ * @default 游戏时长
+ *
+ * @param ---触发开关---
+ * @desc
+ *
+ * @param 黎明开关
+ * @parent ---触发开关---
+ * @type switch
+ * @desc 时间为 3:00-5:00 时，该开关一直处于on状态。
+ * 其它时段为off状态。
  * @default 21
- * @parent -> SWITCHES <<<<<<<<<<<<<<<<<<<<<<<
  *
- * @param Sunrise Switch ID
- * @desc Definição da Switch correspondente ao nascer do sol. 
+ * @param 日出开关
+ * @parent ---触发开关---
+ * @type switch
+ * @desc 时间为 6:00-8:00 时，该开关一直处于on状态。
+ * 其它时段为off状态。
  * @default 22
- * @parent -> SWITCHES <<<<<<<<<<<<<<<<<<<<<<<
  *
- * @param Day Switch ID
- * @desc Definição da Switch correspondente ao dia. 
+ * @param 日间开关
+ * @parent ---触发开关---
+ * @type switch
+ * @desc 时间为 9:00-14:00 时，该开关一直处于on状态。
+ * 其它时段为off状态。
  * @default 23
- * @parent -> SWITCHES <<<<<<<<<<<<<<<<<<<<<<<
  *
- * @param Sunset Switch ID
- * @desc Definição da Switch correspondente ao pôr do sol. 
- * @default 24
- * @parent -> SWITCHES <<<<<<<<<<<<<<<<<<<<<<<
+ * @param 日落开关
+ * @parent ---触发开关---
+ * @type switch
+ * @desc 时间为 15:00-17:00 时，该开关一直处于on状态。
+ * 其它时段为off状态。
+ * @default 24 
  *
- * @param Dusk Switch ID
- * @desc Definição ds Switch correspondente ao crepúsculo. 
- * @default 25
- * @parent -> SWITCHES <<<<<<<<<<<<<<<<<<<<<<<
+ * @param 黄昏开关
+ * @parent ---触发开关---
+ * @type switch
+ * @desc 时间为 18:00-20:00 时，该开关一直处于on状态。
+ * 其它时段为off状态。
+ * @default 25 
  *
- * @param Night Switch ID
- * @desc Definição da Switch correspondente a noite. 
+ * @param 午夜开关
+ * @parent ---触发开关---
+ * @type switch
+ * @desc 时间为 21:00-2:00 时，该开关一直处于on状态。
+ * 其它时段为off状态。
  * @default 26
- * @parent -> SWITCHES <<<<<<<<<<<<<<<<<<<<<<<
  *
- * @param Day Shift Switch ID
- * @desc Definição da Switch correspondente do turno do dia. 
+ * @param 白天开关
+ * @parent ---触发开关---
+ * @type switch
+ * @desc 时间为 9:00-18:00 时，该开关一直处于on状态。
+ * 其它时段为off状态。
  * @default 27
- * @parent -> SWITCHES <<<<<<<<<<<<<<<<<<<<<<<
  *
- * @param Night Shift Switch ID
- * @desc Definição da Switch correspondente do turno da noite. 
+ * @param 黑夜开关
+ * @parent ---触发开关---
+ * @type switch
+ * @desc 时间为 21:00-6:00 时，该开关一直处于on状态。
+ * 其它时段为off状态。
  * @default 28
- * @parent -> SWITCHES <<<<<<<<<<<<<<<<<<<<<<<
  * 
- * @param Day Week Switches IDs
- * @desc Definição das Switches correspondente aos dias da semana. 
- * @default 29,30,31,32,33,34,35
- * @parent -> SWITCHES <<<<<<<<<<<<<<<<<<<<<<<
+ * @param 星期开关
+ * @parent ---触发开关---
+ * @type switch[]
+ * @desc 当前时间为第几个星期时，开关处于on状态。
+ * 顺序为：周日,周一,周二,周三,周四,周五,周六。 
+ * @default ["29","30","31","32","33","34","35"]
  *
- * @param Month Switches IDs
- * @desc Definição das Switches correspondente aos meses. 
- * @default 40,41,42,43,44,45,46,47,48,49,50,51
- * @parent -> SWITCHES <<<<<<<<<<<<<<<<<<<<<<<
+ * @param 月份开关
+ * @parent ---触发开关---
+ * @type switch[]
+ * @desc 当前时间为第几个月时，开关处于on状态。
+ * @default ["40","41","42","43","44","45","46","47","48","49","50","51"]
  *
- * @param Season Switches IDs
- * @desc Definição das Switches correspondente as estações. 
- * @default 36,37,38,39
- * @parent -> SWITCHES <<<<<<<<<<<<<<<<<<<<<<<
+ * @param 季节开关
+ * @parent ---触发开关---
+ * @type switch[]
+ * @desc 当前时间为哪一个季节时，开关处于on状态。
+ * @default ["36","37","38","39"]
  *
- * @param
- * 
- * @param -> VARIABLES <<<<<<<<<<<<<<<<<<<<<<<
+ * @param ---触发变量---
  * @desc
  *
- * @param Hour Variable ID
- * @desc Definição das variável correspondente as horas. 
- * @default 10
- * @parent -> VARIABLES <<<<<<<<<<<<<<<<<<<<<<<
+ * @param 时
+ * @parent ---触发变量---
+ * @type variable
+ * @desc 设置的变量将与当前游戏的小时实时变化。
+ * @default 13
  *
- * @param Day Variable ID
- * @desc Definição das variável correspondente os dias. 
- * @default 11
- * @parent -> VARIABLES <<<<<<<<<<<<<<<<<<<<<<<
+ * @param 分
+ * @parent ---触发变量---
+ * @type variable
+ * @desc 设置的变量将与当前游戏的分钟实时变化。
+ * @default 14
  *
- * @param Year Variable ID
- * @desc Definição das variável correspondente os anos. 
- * @default 12
- * @parent -> VARIABLES <<<<<<<<<<<<<<<<<<<<<<<
+ * @param 秒
+ * @parent ---触发变量---
+ * @type variable
+ * @desc 设置的变量将与当前游戏的秒实时变化。
+ * @default 15
  *
- * @param
- * 
- * @param -> TIME MAX <<<<<<<<<<<<<<<<<<<<<<<
+ * @param 年
+ * @parent ---触发变量---
+ * @type variable
+ * @desc 设置的变量将与当前游戏的年实时变化。
+ * @default 16
+ *
+ * @param 月
+ * @parent ---触发变量---
+ * @type variable
+ * @desc 设置的变量将与当前游戏的月实时变化。
+ * @default 17
+ *
+ * @param 日
+ * @parent ---触发变量---
+ * @type variable
+ * @desc 设置的变量将与当前游戏的日期实时变化。
+ * @default 18
+ *
+ * @param 星期
+ * @parent ---触发变量---
+ * @type variable
+ * @desc 设置的变量将与当前游戏的星期实时变化。
+ * @default 19
+ *
+ * @param 季节
+ * @parent ---触发变量---
+ * @type variable
+ * @desc 设置的变量将与当前游戏的季节实时变化。
+ * @default 20
+ *
+ * @param ---时间最大值---
  * @desc
  *
- * @param Max Minute
- * @desc Definição dos minutos maximo. 
+ * @param 最大分钟数
+ * @parent ---时间最大值---
+ * @type number
+ * @min 1
+ * @desc 你可以设置一小时有多少分钟。
  * @default 60
- * @parent -> TIME MAX <<<<<<<<<<<<<<<<<<<<<<<
  *
- * @param Max Day
- * @desc Definição dos dias maximo. 
- * @default 30
- * @parent -> TIME MAX <<<<<<<<<<<<<<<<<<<<<<<
+ * @param 最大小时数
+ * @parent ---时间最大值---
+ * @type number
+ * @min 1
+ * @desc 你可以设置一天有多少小时。
+ * @default 24
  *
- * @param Max Day Week
- * @desc Definição dos dias da semana maximo. 
+ * @param 最大日期数
+ * @parent ---时间最大值---
+ * @type number
+ * @min 1
+ * @desc 你可以设置一个月有多少天。
+ * @default 30 
+ *
+ * @param 最大星期数
+ * @parent ---时间最大值---
+ * @type number
+ * @min 1
+ * @desc 你可以设置一个星期有多少天。
+ * 如果设置为4，则只剩下周日，周一，周二，周三为一个星期了。
  * @default 7
- * @parent -> TIME MAX <<<<<<<<<<<<<<<<<<<<<<<
  *
- * @param Max Month
- * @desc Definição dos meses maximo. 
+ * @param 最大月份数
+ * @parent ---时间最大值---
+ * @type number
+ * @min 1
+ * @desc 你可以设置一年有多少月。
  * @default 12
- * @parent -> TIME MAX <<<<<<<<<<<<<<<<<<<<<<<
  *
- * @param Max Season
- * @desc Definição das estações maxima. 
+ * @param 最大季节数
+ * @parent ---时间最大值---
+ * @type number
+ * @min 1
+ * @desc 你可以设置一年有多少个季节。
  * @default 4
- * @parent -> TIME MAX <<<<<<<<<<<<<<<<<<<<<<<
  *
- * @param Season Interval
- * @desc Definição do intervalo de meses para mudar de estação. 
- * @default 3
- * @parent -> TIME MAX <<<<<<<<<<<<<<<<<<<<<<< 
- *
- * @param
+ * @param 季节月跨度
+ * @parent ---时间最大值---
+ * @type number
+ * @min 1
+ * @desc 设置多少个月为一个季节。
+ * @default 3  
  * 
- * @param -> START TIME <<<<<<<<<<<<<<<<<<<<<<<
+ * @param ---时间初始化---
  * @desc
  *
- * @param Start Hour
- * @desc Definição do minuto inicial.
- * @default 12
- * @parent -> START TIME <<<<<<<<<<<<<<<<<<<<<<<  
+ * @param 初始分钟
+ * @parent ---时间初始化---
+ * @type number
+ * @min 0
+ * @desc 游戏开始时，分钟的值。
+ * @default 0
  *
- * @param Start Day
- * @desc Definição do dia inicial.
+ * @param 初始小时
+ * @parent ---时间初始化---
+ * @type number
+ * @min 0
+ * @desc 游戏开始时，小时的值。
+ * @default 12 
+ *
+ * @param 初始日期
+ * @parent ---时间初始化---
+ * @type number
+ * @min 0
+ * @desc 游戏开始时，日期的值。
  * @default 1
- * @parent -> START TIME <<<<<<<<<<<<<<<<<<<<<<< 
  *
- * @param Start Month
- * @desc Definição do mês inicial.
+ * @param 初始星期
+ * @parent ---时间初始化---
+ * @type number
+ * @min 0
+ * @desc 设置最初计算开始的星期数，从0年1月1日开始算，设置0表示这天星期一，设置1表示这天星期二。
  * @default 1
- * @parent -> START TIME <<<<<<<<<<<<<<<<<<<<<<< 
  *
- * @param Start Season
- * @desc Definição do estação inicial.
+ * @param 初始月份
+ * @parent ---时间初始化---
+ * @type number
+ * @min 0
+ * @desc 游戏开始时，月份的值。
  * @default 1
- * @parent -> START TIME <<<<<<<<<<<<<<<<<<<<<<< 
  *
- * @param Start Year
- * @desc Definição do ano inicial.
- * @default 1
- * @parent -> START TIME <<<<<<<<<<<<<<<<<<<<<<< 
+ * @param 初始季节
+ * @parent ---时间初始化---
+ * @type number
+ * @min 0
+ * @desc 游戏开始时，季节的值。
+ * @default 1  
  *
- * @param
+ * @param 初始年数
+ * @parent ---时间初始化---
+ * @type number
+ * @min 0
+ * @desc 游戏开始时，年的值。
+ * @default 1 
+ *
+ * @param 是否根据日期自动算星期
+ * @parent ---时间初始化---
+ * @type boolean
+ * @on 自动算
+ * @off 按照初始星期来
+ * @desc true - 自动算，false - 按照初始星期来。
+ * 系统根据1年1月1日为周二开始，根据日期算出星期。
+ * @default false
  * 
- * @param -> TONES <<<<<<<<<<<<<<<<<<<<<<<
+ * @param ---画面色调---
  * @desc
  *
- * @param Sunset Tone
- * @desc Definição da tonalidade.
- * Red,Green,Blue,Alpha      (48,-14,-14,0)
- * @default 48,-14,-14,0
- * @parent -> TONES <<<<<<<<<<<<<<<<<<<<<<<
+ * @param 黎明色调
+ * @parent ---画面色调---
+ * @desc 时间为 3:00-5:00 时的画面色调。
+ * 红,绿,蓝,透明度 (默认-60,-60,-60,0)
+ * @default -60,-60,-60,0
  *
- * @param Dusk Tone
- * @desc Definição da tonalidade.
- * Red,Green,Blue,Alpha      (-90,-90,-90,0)
- * @default -90,-90,-90,0
- * @parent -> TONES <<<<<<<<<<<<<<<<<<<<<<< 
+ * @param 日出色调
+ * @parent ---画面色调---
+ * @desc 时间为 6:00-8:00 时的画面色调。
+ * 红,绿,蓝,透明度 (默认30,30,30,0)
+ * @default 30,30,30,0
  *
- * @param Night Tone
- * @desc Definição da tonalidade.
- * Red,Green,Blue,Alpha     (-128,-128,-128,0)
- * @default -128,-128,-128,0
- * @parent -> TONES <<<<<<<<<<<<<<<<<<<<<<<
+ * @param 日落色调
+ * @parent ---画面色调---
+ * @desc 时间为 15:00-17:00 时的画面色调。
+ * 红,绿,蓝,透明度 (默认36,-14,-14,0)
+ * @default 36,-14,-14,0
  *
- * @param Dawn Tone
- * @desc Definição da tonalidade.
- * Red,Green,Blue,Alpha       (-90,-90,-90,0)
- * @default -90,-90,-90,0
- * @parent -> TONES <<<<<<<<<<<<<<<<<<<<<<<
+ * @param 黄昏色调
+ * @parent ---画面色调---
+ * @desc 时间为 18:00-20:00 时的画面色调。
+ * 红,绿,蓝,透明度 (默认-60,-60,-60,0)
+ * @default -60,-60,-60,0
  *
- * @param Sunrise Tone
- * @desc Definição da tonalidade.
- * Red,Green,Blue,Alpha      (60,60,60,0)
- * @default 60,60,60,0
- * @parent -> TONES <<<<<<<<<<<<<<<<<<<<<<<
+ * @param 午夜色调
+ * @parent ---画面色调---
+ * @desc 时间为 21:00-2:00 时默认的画面色调。
+ * 红,绿,蓝,透明度 (默认-98,-98,-98,0)
+ * @default -98,-98,-98,0
  *
- * @param Day Tone
- * @desc Definição da tonalidade.
- * Red,Green,Blue,Alpha       (0,0,0,0)
+ * @param 白天色调
+ * @parent ---画面色调---
+ * @desc 时间为 9:00-18:00 时默认的画面色调。
+ * 红,绿,蓝,透明度 (默认0,0,0,0)
  * @default 0,0,0,0
- * @parent -> TONES <<<<<<<<<<<<<<<<<<<<<<< 
  *
- * @param
- * 
- * @param -> WINDOWS <<<<<<<<<<<<<<<<<<<<<<<
+ * @param ---窗口---
  * @desc
  *
- * @param Display PM Mode
- * @desc Apresentar as horas no modo AM e PM.
- * @default true
+ * @param 是否使用am/pm模式
+ * @parent ---窗口---
  * @type boolean
- * @parent -> WINDOWS <<<<<<<<<<<<<<<<<<<<<<<
+ * @on 使用
+ * @off 不使用
+ * @desc true - 使用，false - 不使用
+ * 9:00 = 9:00am ，17:00 = 5:00pm 。
+ * @default true  
  *
- * @param Window Time Map Visible
- * @desc Apresentar a janela de tempo no mapa.
- * @default true
+ * @param 窗口是否在地图上显示
+ * @parent ---窗口---
  * @type boolean
- * @parent -> WINDOWS <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param Window Time Menu Visible
- * @desc Apresentar a janela de tempo no menu.
+ * @on 显示
+ * @off 不显示
+ * @desc true - 显示，false - 不显示
  * @default true
- * @type boolean
- * @parent -> WINDOWS <<<<<<<<<<<<<<<<<<<<<<<
  *
- * @param Window Time Map X-Axis
- * @desc Definição da posição X-axis da janela de tempo.
+ * @param 窗口是否在菜单上显示
+ * @parent ---窗口---
+ * @type boolean
+ * @on 显示
+ * @off 不显示
+ * @desc true - 显示，false - 不显示
+ * @default true 
+ *
+ * @param 平移-地图窗口 X
+ * @parent ---窗口---
+ * @desc x轴方向平移，单位像素。0为贴在最左边。
  * @default 576
- * @parent -> WINDOWS <<<<<<<<<<<<<<<<<<<<<<<
  *
- * @param Window Time Map Y-Axis
- * @desc Definição da posição Y-axis da janela de tempo.
+ * @param 平移-地图窗口 Y
+ * @parent ---窗口---
+ * @desc y轴方向平移，单位像素。0为贴在最上面。
  * @default 0
- * @parent -> WINDOWS <<<<<<<<<<<<<<<<<<<<<<<
  *
- * @param Window Time Menu X-Axis
- * @desc Definição da posição X-axis da janela de tempo.
+ * @param 平移-菜单窗口 X
+ * @parent ---窗口---
+ * @desc x轴方向平移，单位像素。0为贴在最左边。
  * @default 0
- * @parent -> WINDOWS <<<<<<<<<<<<<<<<<<<<<<<
  *
- * @param Window Time Menu Y-Axis
- * @desc Definição da posição Y-axis da janela de tempo.
+ * @param 平移-菜单窗口 Y
+ * @parent ---窗口---
+ * @desc y轴方向平移，单位像素。0为贴在最上面。
  * @default 324
- * @parent -> WINDOWS <<<<<<<<<<<<<<<<<<<<<<< 
  *
  * @help  
  * =============================================================================
- * +++ MOG Time System (v1.6 *) +++
+ * +++ MOG Time System (v1.6) +++
  * By Moghunter 
- * https://mogplugins.wordpress.com
+ * https://mogplugins.wordpress.com/
  * =============================================================================
- * Sistema dinámico de tempo com manipulação de switches e variáveis em tempo
- * real. O plugin permite criar eventos baseados nas horas ou até mesmo nos
- * dias da semana e estações do ano.
- * Por exemplo, com plugin é possível criar um evento de uma loja que ficará
- * aberto apenas no turno da noite, ou até mesmo criar um festival que ocorrerá 
- * apenas aos domingos.
- * Ainda é possível desativar o sistema de tempo em tempo real e manipular o
- * tempo manualmente, usando os comandos de eventos, semelhante ao jogo PERSONA.
- * =============================================================================
- * NOTA 1 - Tudo é customizável com exceção da quantidade maxima de horas do dia,
- * devido ao sistema de fases do dia. (dawn,sunrise,day,sunset,dusk,night)
- * NOTA 2 - O comando de evento TINT SCREEN não funciona em mapas com o sistema
- * de tint screen de tempo ativado. 
- * NOTA 3 - O cálculo dos dias da semana é baseado na soma total dos anos,meses,
- * e dias do mês.
- * =============================================================================
- * Para desativar o sistema de tempo em determinados mapas use o comentário 
- * abaixo na caixa de notas do mapa.
+ * 时间系统可以构建虚拟的游戏时钟，并且记录玩家玩游戏的时长。
  *
- * <Disable Time System>
+ * -----------------------------------------------------------------------------
+ * ----设定注意事项
+ * 1.插件的作用域：地图界面、战斗界面、菜单界面。
+ *   该插件为一个实时系统，并在菜单界面会显示一个时间窗口。
+ *   主要作用于地图界面。
+ * 2.时间系统使得游戏能够表现出白天黑夜、日出日落效果。
+ * 3.时间系统关联了变量和开关，你可以设置一个只在周一开放的商店，周末才出现的
+ *   商贩，或者野外才出没的怪兽，一个月后突然袭击的boss等。
+ * 注1 - 修改屏幕色调的函数将被该插件占用，你无法使用那个函数修改画面色调。
+ * 注2 - 你可以设置时间数值的最大值，比如一年只有四个月，每个月一个季节。
+ * 注3 - 日期的计算是基于整的年/月/日
+ * 注4 - 菜单里面的窗口是固定大小的，若挤在一起没地方放，那么窗口会被变透明。
+ * 注5 - 最初的日期为：0年1月1日，星期一，这一天的总天数为1。
+ *       1年1月1日，星期二，这一天的总数为373。(每个月31天)
  *
- * =============================================================================
- * Para desativar a tonalidade do tempo em determinados mapas use o comentário 
- * abaixo na caixa de notas do mapa.
- *
- * <Disable Tint Screen>
- *
- * =============================================================================
- * Para mostrar ou ocultar a janela use os comandos abaixo através do comando
- * Plugin Command.
- *
- * show_clock
- * hide_clock
- *
- * =============================================================================
- * Para forçar ativar ou desativar o sistema de tempo use os comandos abaixo
- * através do comando Plugin Command.
- *
- * enable_time
- * disable_time
+ * -----------------------------------------------------------------------------
+ * ----时间段设定
+ * 黎明：  3:00  - 5:59       日出：  6:00  - 8:59
+ * 日间：  9:00  - 14:59      日落：  15:00 - 17:59
+ * 黄昏：  18:00 - 20:59      午夜：  21:00 - 2:59
  * 
- * =============================================================================
- * Sistema de fases do dia.  
+ * 白天：  9:00  - 17:59      黑夜：  21:00 - 5:59
  *
- * Dawn        = 3am  - 5am
- * Sunrise     = 6am  - 8am
- * Day         = 9am  - 14pm
- * Sunset      = 15pm - 17pm
- * Dusk        = 18pm - 20pm
- * Night       = 21pm - 2am
- * Day Shift   = 9am  - 18pm
- * Night Shift = 21pm - 6am
- * =============================================================================
- * Para manipular o tempo manualmente use os códigos abaixo através do comando
- * chamar script.
+ * -----------------------------------------------------------------------------
+ * ----可选设定
+ * 你可以在某个地图上的控制时间，在其 地图注释 中输入下面关键字：
  *
- * $gameSystem.time_system(boolean)
- * $gameSystem.tint_screen(boolean) 
- * $gameSystem.record_tone
- * $gameSystem.restore_tone
- * $gameSystem.set_time_speed(value)
- * $gameSystem.set_minute(value)
- * $gameSystem.set_hour(value)
- * $gameSystem.set_day(value)
- * $gameSystem.set_month(value)
- * $gameSystem.set_year(value)
- * $gameSystem.set_season(value)
- * $gameSystem.add_minute(value)
- * $gameSystem.add_hour(value)
- * $gameSystem.add_day(value)
- * $gameSystem.add_month(value)
- * $gameSystem.add_year(value)
- * $gameSystem.add_season(value) 
+ * 地图注释（停用时间）：<Disable Time System>
+ * 地图注释（停用色调）：<Disable Tint Screen>
  *
- * ============================================================================
- * - CHECKING THE TIME
- * ============================================================================
- * Para checar o tempo via script command use os comandos abaixo.
+ * 你可以通过插件指令控制时间：
  *
- * $gameSystem.second()
- * $gameSystem.minute()
- * $gameSystem.hour()
- * $gameSystem.hour_pm()
- * $gameSystem.day()
- * $gameSystem.month()
- * $gameSystem.year()
- * $gameSystem.season()
- * $gameSystem.day_week_name()
- * $gameSystem.season_name()
- * $gameSystem.month_name()
+ * 插件指令（显示窗口）：show_clock
+ * 插件指令（隐藏窗口）：hide_clock
  *
- * ============================================================================
- * - WHAT'S  NEW (version 1.6) 
- * ============================================================================
- * - (BUG FIX) - Correção do cálculo dos dias da semana quando se passa um 
- *               mês ou um ano.
- * - (NEW) - Plugins parameters compatíveis com RM1.5+
+ * 插件指令（恢复时间）：enable_time
+ * 插件指令（停用时间）：disable_time
+ * 
+ *
+ * 你可以使用脚本来对时间进行控制：
+ *
+ * 脚本：$gameSystem.time_system(true)
+ *       恢复时间
+ * 脚本：$gameSystem.time_system(false)
+ *       停用时间
+ * 脚本：$gameSystem.tint_screen(true) 
+ *       恢复色调变换
+ * 脚本：$gameSystem.tint_screen(false) 
+ *       停用色调变换
+ * 脚本：$gameSystem.record_tone
+ *       保存当前的色调
+ * 脚本：$gameSystem.restore_tone
+ *       恢复保存的色调
+ * 脚本：$gameSystem.set_time_speed(240)
+ *       设置时间速度为240，实际1秒等于游戏中的4秒。（1秒60帧）
+ * 脚本：$gameSystem.set_minute(20)
+ *       设置当前的分钟数值为20
+ * 脚本：$gameSystem.set_hour(6)
+ *       设置当前的小时数值为6
+ * 脚本：$gameSystem.set_day(15)
+ *       设置当前的日期数值为15
+ * 脚本：$gameSystem.set_month(3)
+ *       设置当前的月份为3
+ * 脚本：$gameSystem.set_year(2)
+ *       设置当前的年为2
+ * 脚本：$gameSystem.set_season(4)
+ *       设置当前的季节为4（冬季）
+ * 脚本：$gameSystem.add_minute(10)
+ *       当前的分钟数 + 10
+ * 脚本：$gameSystem.add_hour(2)
+ *       当前的小时数 + 2
+ * 脚本：$gameSystem.add_day(1)
+ *       当前的日期 + 1
+ * 脚本：$gameSystem.add_month(1)
+ *       当前的月份 + 1
+ * 脚本：$gameSystem.add_year(1)
+ *       当前的年 + 1
+ * 脚本：$gameSystem.add_season(1) 
+ *       当前的季节 + 1
+ *
+ * -----------------------------------------------------------------------------
+ * ----关于drill_up优化
+ * [v1.1]
+ * 修复了设置初始星期的问题，以及最初的设定时间。
+ * [v1.2]
+ * 修复了$gameSystem.add_minute时，分钟+1，小时却不增加的bug。
+ * [v1.3]
+ * 修改了插件分类。
  *
  */
+//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+//插件记录：
+//		mog对于数组，都是通过先用objects获取，再通过函数转层数组。
+//		比如day_week_names，这里就会有很多不同的地方。（检查的mog修复更新了的地方会比较麻烦）
+//		与mog1.6版本比较，下列函数差异比较大：
+//			Game_System.prototype.setup_name_tm	
+//			Game_System.prototype.setup_variable_tm
+//		初始星期的问题在这个函数里改了一行：
+//			Game_System.prototype.set_day_week
+//		分钟+1满时不加小时问题：
+//			Game_System.prototype.add_minute
+//			（避开牵涉到check_max_time函数，那个是mog控制实时变化的量）
 
 //=============================================================================
 // ** PLUGIN PARAMETERS
@@ -443,76 +566,100 @@
 
     // MAIN
   　Moghunter.parameters = PluginManager.parameters('MOG_TimeSystem');
-	Moghunter.time_speed = Number(Moghunter.parameters['Time Speed'] || 120);
-	Moghunter.day_phase_trspd = Number(Moghunter.parameters['Transition Speed'] || 120);
-	Moghunter.time_active_mode = String(Moghunter.parameters['Active Time'] || true);
-	Moghunter.time_tint_mode = String(Moghunter.parameters['Tint Screen'] || true);
-	Moghunter.time_stop_message = String(Moghunter.parameters['Stop During Dialogs'] || true);
-	Moghunter.time_stop_interpreter = String(Moghunter.parameters['Stop During EventRunning'] || true);
+	Moghunter.time_speed = Number(Moghunter.parameters['时间流动速度'] || 120);
+	Moghunter.day_phase_trspd = Number(Moghunter.parameters['色调变换速度'] || 120);
+	Moghunter.time_active_mode = String(Moghunter.parameters['是否默认运行'] || true);
+	Moghunter.time_tint_mode = String(Moghunter.parameters['是否使用色调变换'] || true);
+	Moghunter.time_stop_message = String(Moghunter.parameters['对话时是否停止'] || true);
+	Moghunter.time_stop_interpreter = String(Moghunter.parameters['执行事件时是否停止'] || true);
 	
 	// VARIABLES
-	Moghunter.sec_variableId = Number(Moghunter.parameters['Second Variable ID'] || 10101);
-	Moghunter.min_variableId = Number(Moghunter.parameters['Minute Variable ID'] || 10102);
-	Moghunter.hour_variableId = Number(Moghunter.parameters['Hour Variable ID'] || 10);
-	Moghunter.day_variableId = Number(Moghunter.parameters['Day Variable ID'] || 11);
-	Moghunter.day_week_variableId = Number(Moghunter.parameters['Day Week Variable ID'] || 10104);
-	Moghunter.month_variableId = Number(Moghunter.parameters['Month Variable ID'] || 10005);
-	Moghunter.season_variableId = Number(Moghunter.parameters['Season Variable ID'] || 10106);
-	Moghunter.year_variableId = Number(Moghunter.parameters['Year Variable ID'] || 12);	
+	Moghunter.sec_variableId = Number(Moghunter.parameters['秒'] || 15);
+	Moghunter.min_variableId = Number(Moghunter.parameters['分'] || 14);
+	Moghunter.hour_variableId = Number(Moghunter.parameters['时'] || 13);
+	Moghunter.day_variableId = Number(Moghunter.parameters['日'] || 18);
+	Moghunter.day_week_variableId = Number(Moghunter.parameters['星期'] || 19);
+	Moghunter.month_variableId = Number(Moghunter.parameters['月'] || 17);
+	Moghunter.season_variableId = Number(Moghunter.parameters['季节'] || 20);
+	Moghunter.year_variableId = Number(Moghunter.parameters['年'] || 16);	
 	// SWITCHES
-	Moghunter.dawn_switchId = Number(Moghunter.parameters['Dawn Switch ID'] || 21);
-	Moghunter.sunrise_switchId = Number(Moghunter.parameters['Sunrise Switch ID'] || 22);
-	Moghunter.day_switchId = Number(Moghunter.parameters['Day Switch ID'] || 23);
-	Moghunter.sunset_switchId = Number(Moghunter.parameters['Sunset Switch ID'] || 24);
-    Moghunter.dusk_switchId = Number(Moghunter.parameters['Dusk Switch ID'] || 25);
-	Moghunter.night_switchId = Number(Moghunter.parameters['Night Switch ID'] || 26);	
-    Moghunter.day_phase_switchId = Number(Moghunter.parameters['Day Shift Switch ID'] || 27);
-	Moghunter.night_phase_switchId = Number(Moghunter.parameters['Night Shift Switch ID'] || 28);	
-	Moghunter.day_week_switches = Object(Moghunter.parameters['Day Week Switches IDs'] || []);
-	Moghunter.month_switches = Object(Moghunter.parameters['Month Switches IDs'] || []);
-	Moghunter.season_switches = Object(Moghunter.parameters['Season Switches IDs'] || []);		
+	Moghunter.dawn_switchId = Number(Moghunter.parameters['黎明开关'] || 21);
+	Moghunter.sunrise_switchId = Number(Moghunter.parameters['日出开关'] || 22);
+	Moghunter.day_switchId = Number(Moghunter.parameters['日间开关'] || 23);
+	Moghunter.sunset_switchId = Number(Moghunter.parameters['日落开关'] || 24);
+    Moghunter.dusk_switchId = Number(Moghunter.parameters['黄昏开关'] || 25);
+	Moghunter.night_switchId = Number(Moghunter.parameters['午夜开关'] || 26);	
+    Moghunter.day_phase_switchId = Number(Moghunter.parameters['白天开关'] || 27);
+	Moghunter.night_phase_switchId = Number(Moghunter.parameters['黑夜开关'] || 28);	
+	if( Moghunter.parameters['星期开关'] != "" ){
+		Moghunter.day_week_switches = JSON.parse(Moghunter.parameters['星期开关']);
+	}else{
+		Moghunter.day_week_switches = ["29","30","31","32","33","34","35"] ;
+	}
+	if( Moghunter.parameters['月份开关'] != "" ){
+		Moghunter.month_switches = JSON.parse(Moghunter.parameters['月份开关']);
+	}else{
+		Moghunter.month_switches = ["40","41","42","43","44","45","46","47","48","49","50","51"] ;
+	}
+	if( Moghunter.parameters['季节开关'] != "" ){
+		Moghunter.season_switches = JSON.parse(Moghunter.parameters['季节开关']);
+	}else{
+		Moghunter.season_switches = ["36","37","38","39"] ;
+	}
 	// START	
-	Moghunter.start_minute = Number(Moghunter.parameters['Start Minute'] || 0);
-    Moghunter.start_hour = Number(Moghunter.parameters['Start Hour'] || 12);
-    Moghunter.start_day = Number(Moghunter.parameters['Start Day'] || 1);
-	Moghunter.start_month = Number(Moghunter.parameters['Start Month'] || 1);
-	Moghunter.start_year = Number(Moghunter.parameters['Start Year'] || 1);	
-	Moghunter.start_day_week = Number(Moghunter.parameters['Start Day Week'] || 1);	
-	Moghunter.start_season = Number(Moghunter.parameters['Start Season'] || 1);	
+	Moghunter.start_minute = Number(Moghunter.parameters['初始分钟'] || 0);
+    Moghunter.start_hour = Number(Moghunter.parameters['初始小时'] || 12);
+    Moghunter.start_day = Number(Moghunter.parameters['初始日期'] || 1);
+	Moghunter.start_month = Number(Moghunter.parameters['初始月份'] || 1);
+	Moghunter.start_year = Number(Moghunter.parameters['初始年数'] || 0);	
+	Moghunter.start_day_week = Number(Moghunter.parameters['初始星期'] || 1);	
+	Moghunter.start_season = Number(Moghunter.parameters['初始季节'] || 1);	
     // MAX	
-	Moghunter.min_max = Number(Moghunter.parameters['Max Minute'] || 60);
-	Moghunter.hour_max = Number(Moghunter.parameters['Max hour'] || 24);
-	Moghunter.day_max = Number(Moghunter.parameters['Max Day'] || 30);
-	Moghunter.day_week_max = Number(Moghunter.parameters['Max Day Week'] || 7);
-	Moghunter.month_max = Number(Moghunter.parameters['Max Month'] || 12);
-	Moghunter.season_max = Number(Moghunter.parameters['Max Season'] || 4);
-	Moghunter.season_interval = Number(Moghunter.parameters['Season Interval'] || 3);
+	Moghunter.min_max = Number(Moghunter.parameters['最大分钟数'] || 60);
+	Moghunter.hour_max = Number(Moghunter.parameters['最大小时数'] || 24);
+	Moghunter.day_max = Number(Moghunter.parameters['最大日期数'] || 30);
+	Moghunter.day_week_max = Number(Moghunter.parameters['最大星期数'] || 7);
+	Moghunter.month_max = Number(Moghunter.parameters['最大月份数'] || 12);
+	Moghunter.season_max = Number(Moghunter.parameters['最大季节数'] || 4);
+	Moghunter.season_interval = Number(Moghunter.parameters['季节月跨度'] || 3);
 	// WORDS
-	Moghunter.day_week_names = Object(Moghunter.parameters['Day Week Names'] || "Day Week 1");
-	Moghunter.month_names = Object(Moghunter.parameters['Month Names'] || "Month 1");
-	Moghunter.season_names = Object(Moghunter.parameters['Season Names'] || "Season 1");
-	Moghunter.time_word = Object(Moghunter.parameters['Time Word'] || "Time");
-	Moghunter.day_word = Object(Moghunter.parameters['Day Word'] || "Day");
-	Moghunter.day_week_word = Object(Moghunter.parameters['Day Week Word'] || "Day of Week");
-	Moghunter.month_word = Object(Moghunter.parameters['Month Word'] || "Month");
-	Moghunter.season_word = Object(Moghunter.parameters['Season Word'] || "Season");
-	Moghunter.year_word = Object(Moghunter.parameters['Year Word'] || "Year");
-	Moghunter.play_time_word = Object(Moghunter.parameters['Play Time Word'] || "Play Time");
+	if( Moghunter.parameters['星期名'] != "" ){
+		Moghunter.day_week_names = JSON.parse(Moghunter.parameters['星期名']);
+	}else{
+		Moghunter.day_week_names = ["周日","周一","周二","周三","周四","周五","周六"] ;
+	}
+	if( Moghunter.parameters['月份名'] != "" ){
+		Moghunter.month_names = JSON.parse(Moghunter.parameters['月份名']);
+	}else{
+		Moghunter.month_names = ["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"] ;
+	}
+	if( Moghunter.parameters['季节名'] != "" ){
+		Moghunter.season_names = JSON.parse(Moghunter.parameters['季节名']);
+	}else{
+		Moghunter.season_names = ["春","夏","秋","冬"] ;
+	}
+	Moghunter.time_word = Object(Moghunter.parameters['用语-时间'] || "时间");
+	Moghunter.day_word = Object(Moghunter.parameters['用语-日'] || "日");
+	Moghunter.day_week_word = Object(Moghunter.parameters['用语-星期'] || "星期");
+	Moghunter.month_word = Object(Moghunter.parameters['用语-月'] || "月");
+	Moghunter.season_word = Object(Moghunter.parameters['用语-季节'] || "季节");
+	Moghunter.year_word = Object(Moghunter.parameters['用语-年'] || "年");
+	Moghunter.play_time_word = Object(Moghunter.parameters['用语-游戏时长'] || "游戏时长");
 	// TONES
-	Moghunter.sunset_tone = Object(Moghunter.parameters['Sunset Tone'] || null);
-	Moghunter.dusk_tone = Object(Moghunter.parameters['Dusk Tone'] || null);
-	Moghunter.night_tone = Object(Moghunter.parameters['Night Tone'] || null);
-	Moghunter.dawn_tone = Object(Moghunter.parameters['Dawn Tone'] || null);
-	Moghunter.sunrise_tone = Object(Moghunter.parameters['Sunrise Tone'] || null);
-	Moghunter.day_tone = Object(Moghunter.parameters['Day Tone'] || null);	
+	Moghunter.sunset_tone = Object(Moghunter.parameters['日落色调'] || "");
+	Moghunter.dusk_tone = Object(Moghunter.parameters['黄昏色调'] || "");
+	Moghunter.night_tone = Object(Moghunter.parameters['午夜色调'] || "");
+	Moghunter.dawn_tone = Object(Moghunter.parameters['黎明色调'] || "");
+	Moghunter.sunrise_tone = Object(Moghunter.parameters['日出色调'] || "");
+	Moghunter.day_tone = Object(Moghunter.parameters['白天色调'] || "");	
 	// WINDOWS	
-	Moghunter.display_pm_mode = String(Moghunter.parameters['Display PM Mode'] || true);
-	Moghunter.timeWindow_map = String(Moghunter.parameters['Window Time Map Visible'] || true);
-	Moghunter.timeWindow_menu = String(Moghunter.parameters['Window Time Menu Visible'] || true);
-    Moghunter.timeWindow_X = Number(Moghunter.parameters['Window Time Map X-Axis'] || 576);
-	Moghunter.timeWindow_Y = Number(Moghunter.parameters['Window Time Map Y-Axis'] || 0);	
-    Moghunter.timeWindow_menu_X = Number(Moghunter.parameters['Window Time Menu X-Axis'] || 0);
-	Moghunter.timeWindow_menu_Y = Number(Moghunter.parameters['Window Time Menu Y-Axis'] || 324);
+	Moghunter.display_pm_mode = String(Moghunter.parameters['是否使用am/pm模式'] || true);
+	Moghunter.timeWindow_map = String(Moghunter.parameters['窗口是否在地图上显示'] || true);
+	Moghunter.timeWindow_menu = String(Moghunter.parameters['窗口是否在菜单上显示'] || true);
+    Moghunter.timeWindow_X = Number(Moghunter.parameters['平移-地图窗口 X'] || 576);
+	Moghunter.timeWindow_Y = Number(Moghunter.parameters['平移-地图窗口 Y'] || 0);	
+    Moghunter.timeWindow_menu_X = Number(Moghunter.parameters['平移-菜单窗口 X'] || 0);
+	Moghunter.timeWindow_menu_Y = Number(Moghunter.parameters['平移-菜单窗口 Y'] || 324);
 	
 	
 //=============================================================================
@@ -669,12 +816,9 @@ Game_System.prototype.setup_time_system = function() {
 // * Setup Name TM
 //==============================
 Game_System.prototype.setup_name_tm = function() {
-	this._day_week_names = [];
-	this._season_names = [];
-	this._month_names = [];
-    this.set_time_var(this._day_week_names,Moghunter.day_week_names,0);
-    this.set_time_var(this._season_names,Moghunter.season_names,0);
-	this.set_time_var(this._month_names,Moghunter.month_names,0);	
+	this._day_week_names = Moghunter.day_week_names;
+	this._season_names = Moghunter.season_names;
+	this._month_names = Moghunter.month_names;
 };
 
 //==============================
@@ -742,12 +886,9 @@ Game_System.prototype.setup_switch_tm = function() {
 	this._day_phase_switches = [this._dawn_switchId,this._sunrise_switchId,this._day_switchId,
 	this._sunset_switchId,this._dusk_switchId,this._night_switchId,this._day_phase_switchId,
 	this._night_phase_switchId];
-	this._day_week_switches = [];
-	this._month_switches = [];
-	this._season_switches = [];
-	if (Moghunter.day_week_switches.length > 0){this.set_time_var(this._day_week_switches,Moghunter.day_week_switches,1);};
-	if (Moghunter.month_switches.length > 0){this.set_time_var(this._month_switches,Moghunter.month_switches,1);};
-	if (Moghunter.season_switches.length > 0){this.set_time_var(this._season_switches,Moghunter.season_switches,1);};
+	this._day_week_switches = Moghunter.day_week_switches;
+	this._month_switches = Moghunter.month_switches;
+	this._season_switches = Moghunter.season_switches;
 	for (var i = 0; i < this._day_phase_switches.length; i++) {
 		 $gameSwitches._data[Number(this._day_phase_switches[i])] = false;
 	};	
@@ -767,6 +908,7 @@ Game_System.prototype.setup_switch_tm = function() {
 //==============================
 Game_System.prototype.set_time_var = function(object,value,type) {
 	var s = value.split(',');
+	//var s = value;
 	if (type === 0){
 		for (var i = 0; i < s.length; i++) {object.push(String(s[i]));	};
 	}
@@ -896,7 +1038,10 @@ Game_System.prototype.set_season = function(value) {
 Game_System.prototype.add_minute = function(value) {
    if (value <= 0) {return};
    $gameVariables._data[this._min_variableId] += value;
-   if ($gameVariables._data[this._min_variableId]  >= this.max_time(this._min_variableId)) {this.refresh_time(1,this._minute_variableId)};
+   if ($gameVariables._data[this._min_variableId]  >= this.max_time(this._min_variableId)) {
+	   this.refresh_time(1,this._minute_variableId);
+	   this.add_hour(1);		//在这里小时+1（check_max_time函数过程复杂，不适合改）
+   };
    this.check_max_time(this._min_variableId);   
    this.time_system_clear();
 };
@@ -1056,7 +1201,7 @@ Game_System.prototype.set_day_week = function() {
     this.total_days();
 	var total_weeks = Math.floor(this._total_days_week / this.max_time(this._day_week_variableId)) * this.max_time(this._day_week_variableId)
 	var day = (this._total_days_week - total_weeks)
-	$gameVariables._data[this._day_week_variableId] = day;
+	$gameVariables._data[this._day_week_variableId] = Moghunter.start_day_week + day;
 	for (var i = 0; i < this._day_week_switches.length; i++) {$gameSwitches._data[Number(this._day_week_switches[i])] = false};
 	$gameSwitches._data[Number(this._day_week_switches[$gameVariables._data[this._day_week_variableId]])] = true;
 	$gameMap.requestRefresh();

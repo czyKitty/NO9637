@@ -1,814 +1,1399 @@
 //=============================================================================
-// MOG_ActorHud.js           (Template - 02)
+// MOG_ActorHud.js
 //=============================================================================
 
 /*:
- * @plugindesc (v2.0 *) Adiciona uma Hud com os parâmetros do personagem.
- * @author Moghunter
- *
- * @param -> MAIN <<<<<<<<<<<<<<<<<<<<<<<
- * @desc
- *  
- * @param Initial Visible
- * @desc Ativar a Hud no inicio do jogo.
- * @default true
- * @type boolean
- * @on Visible From Start
- * @off Hide
- * @parent -> MAIN <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param Hud X-Axis
- * @desc Definição da posição X-Axis da Hud.
- * @default 0
- * @type number 
- * @parent -> MAIN <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param Hud Y-Axis
- * @desc Definição da posição Y-Axis da Hud.
- * @default 0
- * @type number
- * @parent -> MAIN <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param Smart Fade
- * @desc Ativa transparência na hud quando a hud estiver acima do personagem.
- * @default true
- * @type boolean
- * @on Overlapping Character
- * @off Always Visible
- * @parent -> MAIN <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param Auto Fade
- * @desc Oculta na hud quando a janela de messagem estiver ativada.
- * @default true
- * @type boolean
- * @on Window Message
- * @off Always Visible 
- * @parent -> MAIN <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param
+ * @plugindesc (v1.9)[v1.6]  地图UI - 玩家信息固定框
+ * @author Moghunter （Drill_up翻译+优化）
  * 
- * @param -> LAYOUT 2 <<<<<<<<<<<<<<<<<<<<<<<
- * @desc 
+ * @Drill_LE_param "角色头像-%d"
+ * @Drill_LE_parentKey "---角色头像%d至%d---"
+ * @Drill_LE_var "Moghunter.ahudFace_list_length"
+ * 
+ * 
+ * @param 是否初始显示
+ * @type boolean
+ * @on 显示
+ * @off 不显示
+ * @desc 进入游戏时是否初始显示整个固定框。
+ * true - 显示，false - 不显示
+ * @default true
  *
- * @param Layout Overlay Visible
- * @desc Apresentar o segundo layout acima dos medidores e face.
+ * @param 资源-固定框
+ * @desc 固定框的图片资源。
+ * @default 玩家固定框-外框
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 平移-整个固定框 X
+ * @desc x轴方向平移，单位像素。0为贴最左边。
+ * @default 0
+ *
+ * @param 平移-整个固定框 Y
+ * @desc y轴方向平移，单位像素。0为贴最上面。
+ * @default 440
+ *
+ * @param 最小透明度
+ * @type number
+ * @min 0
+ * @desc 玩家在地图中进入被固定框挡住的区域时，框会变透明。
+ * 0表示完全透明，255表示完全不透明
+ * @default 60
+ *
+ * @param ------头像------
+ * @default  
+ *
+ * @param 是否显示头像
+ * @parent ------头像------
+ * @type boolean
+ * @on 显示
+ * @off 不显示
+ * @desc true - 显示，false - 不显示
+ * @default true
+ *
+ * @param 平移-头像 X
+ * @parent ------头像------
+ * @desc 以框的位置为基准，x轴方向平移，单位像素。
+ * @default 55
+ *
+ * @param 平移-头像 Y
+ * @parent ------头像------
+ * @desc 以框的位置为基准，y轴方向平移，单位像素。
+ * @default 100
+ *
+ * @param 受伤是否震动头像
+ * @parent ------头像------
+ * @type boolean
+ * @on 震动
+ * @off 不震动
+ * @desc true - 震动，false - 不震动
+ * @default true
+ *
+ * @param 头像是否使用缩放效果
+ * @parent ------头像------
+ * @type boolean
+ * @on 使用
+ * @off 不使用
+ * @desc true - 使用，false - 不使用
+ * @default true
+ *
+ * @param 受伤头像动画帧
+ * @parent ------头像------
+ * @type boolean
+ * @on 使用
+ * @off 不使用
+ * @desc 若开启，则头像将被分成5份，如果受伤震动，则会播放后面4份的图片，形成角色疼痛的动画。
  * @default false
- * @type boolean
- * @on Show
- * @off Hide
- * @parent -> LAYOUT 2 <<<<<<<<<<<<<<<<<<<<<<<
  *
- * @param Layout Overlay X-Axis
- * @desc Definição da posição X-Axis da face.
- * @default 0
- * @type number
- * @parent -> LAYOUT 2 <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param Layout Overlay Y-Axis
- * @desc Definição da posição Y-Axis da face.
- * @default 0
- * @type number
- * @parent -> LAYOUT 2 <<<<<<<<<<<<<<<<<<<<<<<
- * 
- * @param
- * 
- * @param -> FACE <<<<<<<<<<<<<<<<<<<<<<<
- * @desc 
- *
- * @param Face Visible
- * @desc Apresentar a imagem da face.
- * @default false
- * @type boolean
- * @on Show
- * @off Hide
- * @parent -> FACE <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param Face X-Axis
- * @desc Definição da posição X-Axis da face.
- * @default 0
- * @type number
- * @parent -> FACE <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param Face Y-Axis
- * @desc Definição da posição Y-Axis da face.
- * @default 0
- * @type number
- * @parent -> FACE <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param Face Priority
- * @desc Prioridade da Face. (0 Low - 1 High)
- * @default 0
+ * @param 头像的优先权
+ * @parent ------头像------
  * @type select
- * @option (0) Below the Layout
+ * @option 头像在框后面
  * @value 0
- * @option (1) Above the Layout
+ * @option 头像在框前面
  * @value 1
- * @parent -> FACE <<<<<<<<<<<<<<<<<<<<<<<
+ * @desc 0 - 头像在框后面， 1- 头像在框前面
+ * @default 1
  *
- * @param
- * 
- * @param -> NAME <<<<<<<<<<<<<<<<<<<<<<<
- * @desc 
+ * @param ------角色名------
+ * @default
  *
- * @param Name Visible
- * @desc Apresentar o nome do personagem.
- * @default false
+ * @param 是否显示角色名
+ * @parent ------角色名------
  * @type boolean
- * @on Show
- * @off Hide
- * @parent -> NAME <<<<<<<<<<<<<<<<<<<<<<<
+ * @on 显示
+ * @off 不显示
+ * @desc true - 显示，false - 不显示
+ * @default true
  *
- * @param Name X-Axis
- * @desc Definição da posição X-Axis do nome.
- * @default 0
+ * @param 平移-角色名 X
+ * @parent ------角色名------
+ * @desc 以框的位置为基准，x轴方向平移，单位像素。
+ * @default 5
+ *
+ * @param 平移-角色名 Y
+ * @parent ------角色名------
+ * @desc 以框的位置为基准，y轴方向平移，单位像素。
+ * @default 20 
+ *
+ * @param 角色名字体大小
+ * @parent ------角色名------
  * @type number
- * @parent -> NAME <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param Name Y-Axis
- * @desc Definição da posição Y-Axis do nome.
- * @default 0 
- * @type number
- * @parent -> NAME <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param Name Font Size
- * @desc Definição do tamanho da fonte do nome.
+ * @min 1
+ * @desc 角色名的字体大小。
  * @default 20
- * @type number
- * @parent -> NAME <<<<<<<<<<<<<<<<<<<<<<<
  *
- * @param Name Bold Size
- * @desc Definição do tamanho do contorno.
+ * @param 角色名字体粗细
+ * @parent ------角色名------
+ * @type number
+ * @min 1
+ * @desc 角色名的字体粗细。
  * @default 4
- * @type number
- * @parent -> NAME <<<<<<<<<<<<<<<<<<<<<<<
  *
- * @param Name Font Italic
- * @desc Ativar fonte em itálico.
- * @default false
- * @type boolean 
- * @on Enable
- * @off Disable
- * @parent -> NAME <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param
- * 
- * @param -> HP <<<<<<<<<<<<<<<<<<<<<<<
- * @desc 
- *
- * @param HP Meter Visible
- * @text Gauge Visible 
- * @desc Apresentar o medidor de HP
- * @default false
+ * @param 角色名字体是否为斜体
+ * @parent ------角色名------
  * @type boolean
- * @on Show
- * @off Hide
- * @parent -> HP <<<<<<<<<<<<<<<<<<<<<<<
+ * @on 是
+ * @off 否
+ * @desc true - 是，false - 否
+ * @default false
  *
- * @param HP Meter X-Axis
- * @text Gauge X-Axis
- * @desc Definição da posição X-Axis do medidor de HP.
- * @default 0
- * @type number
- * @parent -> HP <<<<<<<<<<<<<<<<<<<<<<<
+ * @param ------生命------
+ * @default 
  *
- * @param HP Meter Y-Axis
- * @text Gauge Y-Axis
- * @desc Definição da posição Y-Axis do medidor de HP.
- * @default 0
- * @type number
- * @parent -> HP <<<<<<<<<<<<<<<<<<<<<<<
+ * @param 是否显示生命条
+ * @parent ------生命------
+ * @type boolean
+ * @on 显示
+ * @off 不显示
+ * @desc true - 显示，false - 不显示
+ * @default true   
  *
- * @param HP Meter Angle
- * @text Gauge Angle  
- * @desc Ángulo do medidor.
+ * @param 资源-生命条
+ * @parent 是否显示生命条
+ * @desc 生命条的图片资源。
+ * @default 玩家固定框-生命条
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 平移-生命条 X
+ * @parent 是否显示生命条
+ * @desc 以框的位置为基准，x轴方向平移，单位像素。
+ * @default 143
+ *
+ * @param 平移-生命条 Y
+ * @parent 是否显示生命条
+ * @desc 以框的位置为基准，x轴方向平移，单位像素。
+ * @default 85
+ *
+ * @param 角度-生命条
+ * @parent 是否显示生命条
+ * @desc 以生命条的位置为基准，逆时针旋转。单位度。
  * @default 0 
- * @type number
- * @parent -> HP <<<<<<<<<<<<<<<<<<<<<<<
  *
- * @param HP Meter Flow Anime
- * @text Gauge Gradient Animation 
- * @desc Ativar animação de gradiente no medidor.
- * É necessário que a imagem tenha 3x a largura do medidor.
- * @default false
+ * @param 生命条是否流动
+ * @parent 是否显示生命条
  * @type boolean
- * @on Enable
- * @off Disable
- * @parent -> HP <<<<<<<<<<<<<<<<<<<<<<<
+ * @on 流动
+ * @off 不流动
+ * @desc 生命条从左往右流动。修改时注意资源图片的宽度。
+ * true - 流动，false - 不流动
+ * @default true
  *
- * @param HP Meter Flow Speed
- * @text Gauge Gradient Speed  
- * @desc Define a velocidade de animação do gradient.
- * É necessário que a imagem tenha 3x a largura do medidor.
- * @default 4
+ * @param 是否显示生命数值
+ * @parent ------生命------
+ * @type boolean
+ * @on 显示
+ * @off 不显示
+ * @desc true - 显示，false - 不显示
+ * @default true   
+ *
+ * @param 资源-生命数值
+ * @parent 是否显示生命数值
+ * @desc 生命数值的图片资源。
+ * @default 玩家固定框-生命数值
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 生命数值最大显示位
+ * @parent 是否显示生命数值
  * @type number
  * @min 1
- * @parent -> HP <<<<<<<<<<<<<<<<<<<<<<<
+ * @max 16
+ * @desc 注意,这里是只显示位数,不负责破限。填12表示最大显示12位数。
+ * 如果你使用了生命破限脚本，请及时修正你想要显示的最大位数。
+ * @default 6
  *
- * @param HP Number Visible
- * @desc Apresentar o numero de HP
- * @default false
- * @type boolean
- * @on Show
- * @off Hide
- * @parent -> HP <<<<<<<<<<<<<<<<<<<<<<<
+ * @param 平移-生命数值 X
+ * @parent 是否显示生命数值
+ * @desc 以框的位置为基准，x轴方向平移，单位像素。
+ * @default 270
  *
- * @param HP Number Align
- * @desc Definição do alinhamento dos números.
- * 0 - Espquerda     1 - Centro       2 - Direita
- * @default 2 
- * @type select
- * @option Left
- * @value 0
- * @option Center
- * @value 1
- * @option Right
- * @value 2  
- * @parent -> HP <<<<<<<<<<<<<<<<<<<<<<<
- *  
- * @param HP Number X-Axis
- * @desc Definição da posição X-Axis do numero de HP.
- * @default 0
- * @type number
- * @parent -> HP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param HP Number Y-Axis
- * @desc Definição da posição Y-Axis do numero de HP.
- * @default 0
- * @type number
- * @parent -> HP <<<<<<<<<<<<<<<<<<<<<<<
- * 
- * @param MaxHP Number Visible
- * @desc Apresentar o numero de HP maximo.
- * @default false
- * @type boolean 
- * @on Show
- * @off Hide
- * @parent -> HP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param MaxHP Number X-Axis
- * @desc Definição da posição X-Axis do numero de HP maximo.
- * @default 0
- * @type number
- * @parent -> HP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param MaxHP Number Y-Axis
- * @desc Definição da posição Y-Axis do numero de HP maximo.
- * @default 0
- * @type number
- * @parent -> HP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param HP Icon Visible
- * @desc Apresentar o ícone de HP.
- * @default true
- * @type boolean 
- * @on Show
- * @off Hide 
- * @parent -> HP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param HP Icon Half Mode
- * @desc Um ícone equivale a 2 pontos de HP.
- * @default true
- * @type boolean 
- * @on Enable (Zelda Style)
- * @off Disable 
- * @parent -> HP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param HP Icon Max Colors
- * @desc Quantidade de cores do ícone.
- * A imagem será dividida pelo número de cores.
- * @default 2
- * @type number
- * @parent -> HP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param HP Icon Max Rows
- * @desc Quantidade de ícones por linha.
- * @default 10
- * @type number
- * @parent -> HP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param HP Icon Max Columns
- * @desc Quantidade de linhas.
- * @default 2
- * @type number
- * @parent -> HP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param HP Icon X-Axis
- * @desc Quantidade X-Axis dos ícones.
- * @default 67
- * @type number
- * @parent -> HP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param HP Icon Y-Axis
- * @desc Quantidade Y-Axis dos ícones.
+ * @param 平移-生命数值 Y
+ * @parent 是否显示生命数值
+ * @desc 以框的位置为基准，y轴方向平移，单位像素。
  * @default 70
- * @type number
- * @parent -> HP <<<<<<<<<<<<<<<<<<<<<<<
  *
- * @param HP Icon Space X
- * @desc Definição do espaço entre os ícones na horizontal.
- * @default 0
- * @type number
- * @parent -> HP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param HP Icon Space Y
- * @desc Definição do espaço entre os ícones na vertical.
- * @default 0
- * @type number
- * @parent -> HP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param HP Icon Zoom Anime
- * @desc Ativar a animação de zoom no último ícone.
- * @type boolean 
- * @on Enable
- * @off Disable  
- * @default true
- 
- * @parent -> HP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param
- * 
- * @param -> MP <<<<<<<<<<<<<<<<<<<<<<<
- * @desc 
- *
- * @param MP Meter Visible
- * @text Gauge Visible 
- * @desc Apresentar o medidor de MP
- * @default true
- * @type boolean
- * @on Show
- * @off Hide 
- * @parent -> MP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param MP Meter X-Axis
- * @text Gauge X-Axis
- * @desc Definição da posição X-Axis do medidor de MP.
- * @default 43
- * @type number
- * @parent -> MP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param MP Meter Y-Axis
- * @text Gauge Y-Axis
- * @desc Definição da posição Y-Axis do medidor de MP.
- * @default 98
- * @type number
- * @parent -> MP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param MP Meter Angle
- * @text Gauge Angle 
- * @desc Ángulo do medidor.
- * @default 0
- * @type number
- * @parent -> MP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param MP Meter Flow Anime
- * @text Gauge Gradient Animation  
- * @desc Ativar animação de gradiente no medidor.
- * É necessário que a imagem tenha 3x a largura do medidor.
- * @default true
- * @type boolean
- * @on Enable
- * @off Disable 
- * @parent -> MP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param MP Meter Flow Speed
- * @text Gauge Gradient Speed  
- * @desc Define a velocidade de animação do gradient.
- * É necessário que a imagem tenha 3x a largura do medidor.
- * @default 2
- * @type number
- * @min 1
- * @parent -> MP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param MP Number Visible
- * @desc Apresentar o numero de MP
- * @default false
- * @type boolean
- * @on Show
- * @off Hide 
- * @parent -> MP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param MP Number Align
- * @desc Definição do alinhamento dos números.
- * 0 - Espquerda     1 - Centro       2 - Direita
- * @default 0
+ * @param 生命数值文本对齐方式
+ * @parent 是否显示生命数值
  * @type select
- * @option Left
+ * @option 左对齐
  * @value 0
- * @option Center
+ * @option 居中
  * @value 1
- * @option Right
- * @value 2   
- * @parent -> MP <<<<<<<<<<<<<<<<<<<<<<<
- *  
- * @param MP Number X-Axis
- * @desc Definição da posição X-Axis do numero de MP.
- * @default 0
- * @type number
- * @parent -> MP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param MP Number Y-Axis
- * @desc Definição da posição Y-Axis do numero de MP.
- * @default 0
- * @type number
- * @parent -> MP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param MaxMP Number Visible
- * @desc Apresentar o numero de MP maximo.
- * @default false
- * @type boolean 
- * @on Show
- * @off Hide 
- * @parent -> MP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param MaxMP Number X-Axis
- * @desc Definição da posição X-Axis do numero de MP maximo.
- * @default 0
- * @type number
- * @parent -> MP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param MaxMP Number Y-Axis
- * @desc Definição da posição Y-Axis do numero de MP maximo.
- * @default 0
- * @type number
- * @parent -> MP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param MP Icon Visible
- * @desc Apresentar o ícone de MP.
- * @default false
- * @type boolean 
- * @on Show
- * @off Hide 
- * @parent -> MP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param MP Icon Half Mode
- * @desc Um ícone equivale a 2 pontos de MP.
- * @default false
- * @type boolean 
- * @on Enable (Zelda Style)
- * @off Disable 
- * @parent -> MP <<<<<<<<<<<<<<<<<<<<<<<
- * 
- * @param MP Icon Max Colors
- * @desc Quantidade de cores do ícone.
- * A imagem será dividida pelo número de cores.
- * @default 0
- * @type number
- * @parent -> MP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param MP Icon Max Rows
- * @desc Quantidade de ícones por linha.
- * @default 1
- * @parent -> MP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param MP Icon Max Columns
- * @desc Quantidade de linhas.
- * @default 1
- * @type number
- * @parent -> MP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param MP Icon X-Axis
- * @desc Quantidade X-Axis dos ícones.
- * @default 0
- * @type number
- * @parent -> MP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param MP Icon Y-Axis
- * @desc Quantidade Y-Axis dos ícones.
- * @default 0
- * @type number
- * @parent -> MP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param MP Icon Space X
- * @desc Definição do espaço entre os ícones na horizontal.
- * @default 0
- * @type number
- * @parent -> MP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param MP Icon Space Y
- * @desc Definição do espaço entre os ícones na vertical.
- * @default 0
- * @type number
- * @parent -> MP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param MP Icon Zoom Anime
- * @desc Ativar a animação de zoom no último ícone.
- * @default false
- * @type boolean 
- * @on Enable
- * @off Disable
- * @parent -> MP <<<<<<<<<<<<<<<<<<<<<<<
- * 
- * @param
- * 
- * @param -> TP <<<<<<<<<<<<<<<<<<<<<<<
- * @desc 
- *
- * @param TP Meter Visible
- * @text Gauge Visible  
- * @desc Apresentar o medidor de TP
- * @default false
- * @type boolean
- * @on Show
- * @off Hide 
- * @parent -> TP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param TP Meter X-Axis
- * @text Gauge X-Axis
- * @desc Definição da posição X-Axis do medidor de TP.
- * @default 0
- * @type number
- * @parent -> TP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param TP Meter Y-Axis
- * @text Gauge Y-Axis
- * @desc Definição da posição Y-Axis do medidor de TP.
- * @default 0
- * @type number
- * @parent -> TP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param TP Meter Angle
- * @text Gauge Angle
- * @desc Ángulo do medidor.
- * @default 0
- * @parent -> TP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param TP Meter Flow Anime
- * @text Gauge Gradient Animation 
- * @desc Ativar animação de gradiente no medidor.
- * É necessário que a imagem tenha 3x a largura do medidor.
- * @default false
- * @type boolean
- * @on Enable
- * @off Disable
- * @parent -> TP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param TP Meter Flow Speed
- * @text Gauge Gradient Speed  
- * @desc Define a velocidade de animação do gradient.
- * É necessário que a imagem tenha 3x a largura do medidor.
- * @default 4
- * @type number
- * @min 1
- * @parent -> TP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param TP Number Visible
- * @desc Apresentar o numero de TP.
- * @default false  
- * @type boolean
- * @on Show
- * @off Hide
- * @parent -> TP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param TP Number Align
- * @desc Definição do alinhamento dos números.
- * 0 - Espquerda     1 - Centro       2 - Direita
- * @default 0
- * @type select
- * @option Left
- * @value 0
- * @option Center
- * @value 1
- * @option Right
- * @value 2  
- * @parent -> TP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param TP Number X-Axis
- * @desc Definição da posição X-Axis do numero de TP.
- * @default 0
- * @type number
- * @parent -> TP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param TP Number Y-Axis
- * @desc Definição da posição Y-Axis do numero de TP.
- * @default 0
- * @type number
- * @parent -> TP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param MaxTP Number Visible
- * @desc Apresentar o numero de TP maximo.
- * @default false
- * @parent -> TP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param MaxTP Number X-Axis
- * @desc Definição da posição X-Axis do numero de TP maximo.
- * @default 0
- * @type number
- * @parent -> TP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param MaxTP Number Y-Axis
- * @desc Definição da posição Y-Axis do numero de TP maximo.
- * @default 0
- * @type number
- * @parent -> TP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param TP Icon Visible
- * @desc Apresentar o ícone de TP.
- * @default false
- * @type boolean 
- * @on Show
- * @off Hide
- * @parent -> TP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param TP Icon Half Mode
- * @desc Um ícone equivale a 2 pontos de TP.
- * @default false
- * @type boolean 
- * @on Enable (Zelda Style)
- * @off Disable 
- * @parent -> TP <<<<<<<<<<<<<<<<<<<<<<<
- * 
- * @param TP Icon Max Colors
- * @desc Quantidade de cores do ícone.
- * A imagem será dividida pelo número de cores.
- * @default 2
- * @type number
- * @parent -> TP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param TP Icon Max Rows
- * @desc Quantidade de ícones por linha.
- * @default 10
- * @type number
- * @parent -> TP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param TP Icon Max Columns
- * @desc Quantidade de linhas.
- * @default 2
- * @type number
- * @parent -> TP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param TP Icon X-Axis
- * @desc Quantidade X-Axis dos ícones.
- * @default 0
- * @type number
- * @parent -> TP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param TP Icon Y-Axis
- * @desc Quantidade Y-Axis dos ícones.
- * @default 0
- * @type number
- * @parent -> TP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param TP Icon Space X
- * @desc Definição do espaço entre os ícones na horizontal.
- * @default 0
- * @type number
- * @parent -> TP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param TP Icon Space Y
- * @desc Definição do espaço entre os ícones na vertical.
- * @default 0
- * @type number
- * @parent -> TP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param TP Icon Zoom Anime
- * @desc Ativar a animação de zoom no último ícone.
- * @default true
- * @type boolean 
- * @on Enable
- * @off Disable
- * @parent -> TP <<<<<<<<<<<<<<<<<<<<<<<
- * 
- * @param
- * 
- * @param -> EXP <<<<<<<<<<<<<<<<<<<<<<<
- * @desc 
- *
- * @param EXP Meter Visible
- * @desc Apresentar o medidor de EXP
- * @default false
- * @type boolean
- * @on Show
- * @off Hide
- * @parent -> EXP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param EXP Meter X-Axis
- * @desc Definição da posição X-Axis do medidor de EXP.
- * @default 0
- * @type number
- * @parent -> EXP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param EXP Meter Y-Axis
- * @desc Definição da posição Y-Axis do medidor de EXP.
- * @default 0
- * @type number
- * @parent -> EXP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param EXP Meter Angle
- * @desc Ángulo do medidor.
- * @default 0
- * @type number
- * @parent -> EXP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param Level Number Visible
- * @desc Apresentar o numero de Level.
- * @default false
- * @type boolean
- * @on Show
- * @off Hide
- * @parent -> EXP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param Level Number Align
- * @desc Definição do alinhamento dos números.
- * 0 - Espquerda     1 - Centro       2 - Direita
- * @default 0
- * @type select
- * @option Left
- * @value 0
- * @option Center
- * @value 1
- * @option Right
+ * @option 右对齐
  * @value 2
- * @parent -> EXP <<<<<<<<<<<<<<<<<<<<<<<
- * 
- * @param Level Number X-Axis
- * @desc Definição da posição X-Axis do numero de Level.
+ * @desc 0 - 左对齐，1- 居中，2 - 右对齐
  * @default 0
- * @type number
- * @parent -> EXP <<<<<<<<<<<<<<<<<<<<<<<
- *
- * @param Level Number Y-Axis
- * @desc Definição da posição Y-Axis do numero de Level.
- * @default 0
- * @type number
- * @parent -> EXP <<<<<<<<<<<<<<<<<<<<<<<
  * 
- * @param
- * 
- * @param -> STATES <<<<<<<<<<<<<<<<<<<<<<<
- * @desc 
- *
- * @param States Visible
- * @desc Apresentar o numero as condições.
- * @default false
+ * @param 是否显示最大生命数值
+ * @parent ------生命------
  * @type boolean
- * @on Show
- * @off Hide
- * @parent -> STATES <<<<<<<<<<<<<<<<<<<<<<<
+ * @on 显示
+ * @off 不显示
+ * @desc true - 显示，false - 不显示
+ * @default false
  *
- * @param States X-Axis
- * @desc Definição da posição X-Axis das condições.
- * @default 0
- * @type number
- * @parent -> STATES <<<<<<<<<<<<<<<<<<<<<<<
+ * @param 平移-最大生命数值 X
+ * @parent 是否显示最大生命数值
+ * @desc 以框的位置为基准，x轴方向平移，单位像素。
+ * @default 185
  *
- * @param States Y-Axis
- * @desc Definição da posição Y-Axis das condições.
- * @default 0
+ * @param 平移-最大生命数值 Y
+ * @parent 是否显示最大生命数值
+ * @desc 以框的位置为基准，y轴方向平移，单位像素。
+ * @default 40
+ *
+ * @param 是否显示生命图标
+ * @parent ------生命------
+ * @type boolean
+ * @on 显示
+ * @off 不显示
+ * @desc true - 显示，false - 不显示
+ * @default false
+ *
+ * @param 资源-生命图标
+ * @parent 是否显示生命图标
+ * @desc 生命图标的图片资源。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 是否使用半血模式
+ * @parent 是否显示生命图标
+ * @type boolean
+ * @on 使用
+ * @off 不使用
+ * @desc true - 使用，false - 不使用
+ * 使用则生命图标会根据生命值出现一半图标的情况。
+ * @default false
+ *
+ * @param 生命图标值跨度
+ * @parent 是否显示生命图标
  * @type number
- * @parent -> STATES <<<<<<<<<<<<<<<<<<<<<<<
+ * @min 1
+ * @desc 每个图标代表的生命量。
+ * @default 1
+ *
+ * @param 生命图标种类最大数量
+ * @parent 是否显示生命图标
+ * @type number
+ * @min 2
+ * @desc 设置7，将会把图标资源切成7份，来表示不同阶级的血量。
+ * 至少2种图标，第1种表示空血图标。
+ * @default 7
+ *
+ * @param 生命图标列数
+ * @parent 是否显示生命图标
+ * @type number
+ * @min 1
+ * @desc 生命图标横向排布的列数。
+ * @default 20
+ *
+ * @param 生命图标行数
+ * @parent 是否显示生命图标
+ * @type number
+ * @min 1
+ * @desc 生命图标纵向排布的行数。
+ * @default 1
+ *
+ * @param 平移-生命图标 X
+ * @parent 是否显示生命图标
+ * @desc 以框的位置为基准，x轴方向平移，单位像素。
+ * @default 50
+ *
+ * @param 平移-生命图标 Y
+ * @parent 是否显示生命图标
+ * @desc 以框的位置为基准，y轴方向平移，单位像素。
+ * @default 20
+ *
+ * @param 生命图标间距 X
+ * @parent 是否显示生命图标
+ * @desc 图标x轴方向的间距，单位像素。（可为负数）
+ * @default 0
+ *
+ * @param 生命图标间距 Y
+ * @parent 是否显示生命图标
+ * @desc 图标y轴方向的间距，单位像素。（可为负数）
+ * @default 0
+ *
+ * @param 生命图标是否使用缩放效果
+ * @parent 是否显示生命图标
+ * @type boolean
+ * @on 使用
+ * @off 不使用
+ * @desc true - 使用，false - 不使用
+ * @default true
+ *
+ * @param ------魔法------
+ * @default  
+ *
+ * @param 是否显示魔法条
+ * @parent ------魔法------
+ * @type boolean
+ * @on 显示
+ * @off 不显示
+ * @desc true - 显示，false - 不显示
+ * @default true   
+ *
+ * @param 资源-魔法条
+ * @parent 是否显示魔法条
+ * @desc 魔法条的图片资源。
+ * @default 玩家固定框-魔法条
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 平移-魔法条 X
+ * @parent 是否显示魔法条
+ * @desc 以框的位置为基准，x轴方向平移，单位像素。
+ * @default 160
+ *
+ * @param 平移-魔法条 Y
+ * @parent 是否显示魔法条
+ * @desc 以框的位置为基准，y轴方向平移，单位像素。
+ * @default 115
+ *
+ * @param 角度-魔法条
+ * @parent 是否显示魔法条
+ * @desc 以魔法条的位置为基准，逆时针旋转。
+ * @default 0
+ *
+ * @param 魔法条是否流动
+ * @parent 是否显示魔法条
+ * @on 流动
+ * @off 不流动
+ * @desc 魔法条从左往右流动。修改时注意资源图片的宽度。
+ * true - 流动，false - 不流动
+ * @default true
+ *
+ * @param 是否显示魔法数值
+ * @parent ------魔法------
+ * @type boolean
+ * @on 显示
+ * @off 不显示
+ * @desc true - 显示，false - 不显示
+ * @default true
+ *
+ * @param 资源-魔法数值
+ * @parent 是否显示魔法数值
+ * @desc 魔法数值的图片资源。
+ * @default 玩家固定框-魔法数值
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 魔法数值最大显示位
+ * @parent 是否显示魔法数值
+ * @type number
+ * @min 1
+ * @max 16
+ * @desc 注意,这里是只显示位数,不负责破限。填12表示最大显示12位数。
+ * 如果你使用了魔法破限脚本，请及时修正你想要显示的最大位数。
+ * @default 6
+ *
+ * @param 平移-魔法数值 X
+ * @parent 是否显示魔法数值
+ * @desc 以框的位置为基准，x轴方向平移，单位像素。
+ * @default 287
+ *
+ * @param 平移-魔法数值 Y
+ * @parent 是否显示魔法数值
+ * @desc 以框的位置为基准，y轴方向平移，单位像素。
+ * @default 100
+ *
+ * @param 魔法数值文本对齐方式
+ * @parent 是否显示魔法数值
+ * @type select
+ * @option 左对齐
+ * @value 0
+ * @option 居中
+ * @value 1
+ * @option 右对齐
+ * @value 2
+ * @desc 0 - 左对齐，1- 居中，2 - 右对齐
+ * @default 0
+ *
+ * @param 是否显示最大魔法数值
+ * @parent ------魔法------
+ * @type boolean
+ * @on 显示
+ * @off 不显示
+ * @desc true - 显示，false - 不显示
+ * @default false
+ *
+ * @param 平移-最大魔法数值 X
+ * @parent 是否显示最大魔法数值
+ * @desc 以框的位置为基准，x轴方向平移，单位像素。
+ * @default 196
+ *
+ * @param 平移-最大魔法数值 Y
+ * @parent 是否显示最大魔法数值
+ * @desc 以框的位置为基准，y轴方向平移，单位像素。
+ * @default 78
+ *
+ * @param 是否显示魔法图标
+ * @parent ------魔法------
+ * @type boolean
+ * @on 显示
+ * @off 不显示
+ * @desc true - 显示，false - 不显示
+ * @default false
+ *
+ * @param 资源-魔法图标
+ * @parent 是否显示魔法图标
+ * @desc 魔法图标的图片资源。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 是否使用半魔模式
+ * @parent 是否显示魔法图标
+ * @type boolean
+ * @on 使用
+ * @off 不使用
+ * @desc true - 使用，false - 不使用
+ * 使用则魔法图标会根据魔法值出现一半图标的情况。
+ * @default false
+ *
+ * @param 魔法图标值跨度
+ * @parent 是否显示魔法图标
+ * @type number
+ * @min 1
+ * @desc 每个图标代表的魔法量。
+ * @default 1
+ *
+ * @param 魔法图标种类最大数量
+ * @parent 是否显示魔法图标
+ * @type number
+ * @min 2
+ * @desc 设置7，将会把图标资源切成7份，来表示不同阶级的魔法值。
+ * 至少2种图标，第1种表示空魔图标。
+ * @default 7
+ *
+ * @param 魔法图标列数
+ * @parent 是否显示魔法图标
+ * @type number
+ * @min 1
+ * @desc 魔法图标横向排布的列数。
+ * @default 20
+ *
+ * @param 魔法图标行数
+ * @parent 是否显示魔法图标
+ * @type number
+ * @min 1
+ * @desc 魔法图标纵向排布的行数。
+ * @default 1
+ *
+ * @param 平移-魔法图标 X
+ * @parent 是否显示魔法图标
+ * @desc 以框的位置为基准，x轴方向平移，单位像素。
+ * @default 50
+ *
+ * @param 平移-魔法图标 Y
+ * @parent 是否显示魔法图标
+ * @desc 以框的位置为基准，y轴方向平移，单位像素。
+ * @default 20
+ *
+ * @param 魔法图标间距 X
+ * @parent 是否显示魔法图标
+ * @desc 图标x轴方向的间距，单位像素。（可为负数）
+ * @default 0
+ *
+ * @param 魔法图标间距 Y
+ * @parent 是否显示魔法图标
+ * @desc 图标y轴方向的间距，单位像素。（可为负数）
+ * @default 0
+ *
+ * @param 魔法图标是否使用缩放效果
+ * @parent 是否显示魔法图标
+ * @type boolean
+ * @on 使用
+ * @off 不使用
+ * @desc true - 使用，false - 不使用
+ * @default true
+ *
+ * @param ------怒气------
+ * @default  
+ *
+ * @param 是否显示怒气条
+ * @parent ------怒气------
+ * @type boolean
+ * @on 显示
+ * @off 不显示
+ * @desc true - 显示，false - 不显示
+ * @default true   
+ *
+ * @param 资源-怒气条
+ * @parent 是否显示怒气条
+ * @desc 怒气条的图片资源。
+ * @default 玩家固定框-怒气条
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 平移-怒气条 X
+ * @parent 是否显示怒气条
+ * @desc 以框的位置为基准，x轴方向平移，单位像素。
+ * @default 143
+ *
+ * @param 平移-怒气条 Y
+ * @parent 是否显示怒气条
+ * @desc 以框的位置为基准，y轴方向平移，单位像素。
+ * @default 145
+ *
+ * @param 角度-怒气条
+ * @parent 是否显示怒气条
+ * @desc 以怒气条的位置为基准，逆时针旋转。
+ * @default 0
+ *
+ * @param 怒气条是否流动
+ * @parent 是否显示怒气条
+ * @type boolean
+ * @on 流动
+ * @off 不流动
+ * @desc 怒气条从左往右流动。修改时注意资源图片的宽度。
+ * true - 流动，false - 不流动
+ * @default true
+ *
+ * @param 是否显示怒气数值
+ * @parent ------怒气------
+ * @type boolean
+ * @on 显示
+ * @off 不显示
+ * @desc true - 显示，false - 不显示
+ * @default true   
+ *
+ * @param 怒气数值最大显示位
+ * @parent 是否显示怒气数值
+ * @type number
+ * @min 1
+ * @max 16
+ * @desc 注意,这里是只显示位数,不负责破限。填12表示最大显示12位数。
+ * 如果你使用了怒气破限脚本，请及时修正你想要显示的最大位数。
+ * @default 3
+ *
+ * @param 资源-怒气数值
+ * @parent 是否显示怒气数值
+ * @desc 怒气数值的图片资源。
+ * @default 玩家固定框-怒气数值
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 平移-怒气数值 X
+ * @parent 是否显示怒气数值
+ * @desc 以框的位置为基准，x轴方向平移，单位像素。
+ * @default 270
+ *
+ * @param 平移-怒气数值 Y
+ * @parent 是否显示怒气数值
+ * @desc 以框的位置为基准，y轴方向平移，单位像素。
+ * @default 130
+ *
+ * @param 怒气数值文本对齐方式
+ * @parent 是否显示怒气数值
+ * @type select
+ * @option 左对齐
+ * @value 0
+ * @option 居中
+ * @value 1
+ * @option 右对齐
+ * @value 2
+ * @desc 0 - 左对齐，1- 居中，2 - 右对齐
+ * @default 0
+ *
+ * @param 是否显示最大怒气数值
+ * @parent ------怒气------
+ * @type boolean
+ * @on 显示
+ * @off 不显示
+ * @desc true - 显示，false - 不显示
+ * @default false
+ *
+ * @param 平移-最大怒气数值 X
+ * @parent 是否显示最大怒气数值
+ * @desc 以框的位置为基准，x轴方向平移，单位像素。
+ * @default 185
+ *
+ * @param 平移-最大怒气数值 Y
+ * @parent 是否显示最大怒气数值
+ * @desc 以框的位置为基准，y轴方向平移，单位像素。
+ * @default 116
+ *
+ * @param 是否显示怒气图标
+ * @parent ------怒气------
+ * @type boolean
+ * @on 显示
+ * @off 不显示
+ * @desc true - 显示，false - 不显示
+ * @default false
+ *
+ * @param 资源-怒气图标
+ * @parent 是否显示怒气图标
+ * @desc 怒气图标的图片资源。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 是否使用半怒模式
+ * @parent 是否显示怒气图标
+ * @type boolean
+ * @on 使用
+ * @off 不使用
+ * @desc true - 使用，false - 不使用
+ * 使用则怒气图标会根据怒气值出现一半图标的情况。
+ * @default false
+ *
+ * @param 怒气图标值跨度
+ * @parent 是否显示怒气图标
+ * @type number
+ * @min 1
+ * @desc 每个图标代表的怒气量。
+ * @default 1
+ *
+ * @param 怒气图标种类最大数量
+ * @parent 是否显示怒气图标
+ * @type number
+ * @min 1
+ * @desc 设置7，将会把图标资源切成7份，来表示不同阶级的怒气值。
+ * 至少2种图标，第1种表示空怒图标。
+ * @default 7
+ *
+ * @param 怒气图标列数
+ * @parent 是否显示怒气图标
+ * @type number
+ * @min 1
+ * @desc 怒气图标横向排布的列数。
+ * @default 10
+ *
+ * @param 怒气图标行数
+ * @parent 是否显示怒气图标
+ * @type number
+ * @min 1
+ * @desc 怒气图标纵向排布的行数。
+ * @default 1
+ *
+ * @param 平移-怒气图标 X
+ * @parent 是否显示怒气图标
+ * @desc 以框的位置为基准，x轴方向平移，单位像素。
+ * @default 50
+ *
+ * @param 平移-怒气图标 Y
+ * @parent 是否显示怒气图标
+ * @desc 以框的位置为基准，y轴方向平移，单位像素。
+ * @default 20
+ *
+ * @param 怒气图标间距 X
+ * @parent 是否显示怒气图标
+ * @desc 图标x轴方向的间距，单位像素。（可为负数）
+ * @default 0
+ *
+ * @param 怒气图标间距 Y
+ * @parent 是否显示怒气图标
+ * @desc 图标y轴方向的间距，单位像素。（可为负数）
+ * @default 0
+ *
+ * @param 怒气图标是否使用缩放效果
+ * @parent 是否显示怒气图标
+ * @type boolean
+ * @on 使用
+ * @off 不使用
+ * @desc true - 使用，false - 不使用
+ * @default true
+ *
+ * @param ------经验------
+ * @default  
+ *
+ * @param 是否显示经验条
+ * @parent ------经验------
+ * @type boolean
+ * @on 显示
+ * @off 不显示
+ * @desc true - 显示，false - 不显示
+ * @default true   
+ *
+ * @param 资源-经验条
+ * @parent ------经验------
+ * @desc 经验条的图片资源。
+ * @default 玩家固定框-经验条
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 平移-经验条 X
+ * @parent ------经验------
+ * @desc 以框的位置为基准，x轴方向平移，单位像素。
+ * @default 127
+ *
+ * @param 平移-经验条 Y
+ * @parent ------经验------
+ * @desc 以框的位置为基准，y轴方向平移，单位像素。
+ * @default 173
+ *
+ * @param 角度-经验条
+ * @parent ------经验------
+ * @desc 以经验条的位置为基准，逆时针旋转。
+ * @default 0
+ *
+ * @param 是否显示等级数值
+ * @parent ------经验------
+ * @type boolean
+ * @on 显示
+ * @off 不显示
+ * @desc true - 显示，false - 不显示
+ * @default true   
+ *
+ * @param 资源-等级数值
+ * @parent ------经验------
+ * @desc 等级数值的图片资源。
+ * @default 玩家固定框-等级数值
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 等级数值最大显示位
+ * @parent 是否显示等级数值
+ * @type number
+ * @min 1
+ * @max 16
+ * @desc 注意,这里是只显示位数,不负责破限。填12表示最大显示12位数。
+ * 如果你使用了等级破限脚本，请及时修正你想要显示的最大位数。
+ * @default 4
+ *
+ * @param 平移-等级数值 X
+ * @parent 是否显示等级数值
+ * @desc 以框的位置为基准，x轴方向平移，单位像素。
+ * @default 65
+ *
+ * @param 平移-等级数值 Y
+ * @parent 是否显示等级数值
+ * @desc 以框的位置为基准，y轴方向平移，单位像素。
+ * @default 153
+ *
+ * @param 等级数值文本对齐方式
+ * @parent 是否显示等级数值
+ * @type select
+ * @option 左对齐
+ * @value 0
+ * @option 居中
+ * @value 1
+ * @option 右对齐
+ * @value 2
+ * @desc 0 - 左对齐，1- 居中，2 - 右对齐
+ * @default 1
+ *
+ * @param ------状态------
+ * @default 
+ *
+ * @param 是否显示状态
+ * @parent ------状态------
+ * @type boolean
+ * @on 显示
+ * @off 不显示
+ * @desc true - 显示，false - 不显示
+ * @default true   
+ *
+ * @param 平移-状态 X
+ * @parent ------状态------
+ * @desc 以框的位置为基准，x轴方向平移，单位像素。
+ * @default 5
+ *
+ * @param 平移-状态 Y
+ * @parent ------状态------
+ * @desc 以框的位置为基准，y轴方向平移，单位像素。
+ * @default 64
+ *
+ *
+ * @param ---------------------------
+ * @default 
+ * 
+ * @param ---角色头像 1至20---
+ * @default 
+ *
+ * @param 角色头像-1
+ * @parent ---角色头像 1至20---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-2
+ * @parent ---角色头像 1至20---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-3
+ * @parent ---角色头像 1至20---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-4
+ * @parent ---角色头像 1至20---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-5
+ * @parent ---角色头像 1至20---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-6
+ * @parent ---角色头像 1至20---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-7
+ * @parent ---角色头像 1至20---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-8
+ * @parent ---角色头像 1至20---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-9
+ * @parent ---角色头像 1至20---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-10
+ * @parent ---角色头像 1至20---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-11
+ * @parent ---角色头像 1至20---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-12
+ * @parent ---角色头像 1至20---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-13
+ * @parent ---角色头像 1至20---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-14
+ * @parent ---角色头像 1至20---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-15
+ * @parent ---角色头像 1至20---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-16
+ * @parent ---角色头像 1至20---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-17
+ * @parent ---角色头像 1至20---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-18
+ * @parent ---角色头像 1至20---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-19
+ * @parent ---角色头像 1至20---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-20
+ * @parent ---角色头像 1至20---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ * 
+ * @param ---角色头像21至40---
+ * @default 
+ *
+ * @param 角色头像-21
+ * @parent ---角色头像21至40---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-22
+ * @parent ---角色头像21至40---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-23
+ * @parent ---角色头像21至40---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-24
+ * @parent ---角色头像21至40---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-25
+ * @parent ---角色头像21至40---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-26
+ * @parent ---角色头像21至40---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-27
+ * @parent ---角色头像21至40---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-28
+ * @parent ---角色头像21至40---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-29
+ * @parent ---角色头像21至40---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-30
+ * @parent ---角色头像21至40---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-31
+ * @parent ---角色头像21至40---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-32
+ * @parent ---角色头像21至40---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-33
+ * @parent ---角色头像21至40---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-34
+ * @parent ---角色头像21至40---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-35
+ * @parent ---角色头像21至40---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-36
+ * @parent ---角色头像21至40---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-37
+ * @parent ---角色头像21至40---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-38
+ * @parent ---角色头像21至40---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-39
+ * @parent ---角色头像21至40---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-40
+ * @parent ---角色头像21至40---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ * 
+ * @param ---角色头像41至60---
+ * @default 
+ *
+ * @param 角色头像-41
+ * @parent ---角色头像41至60---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-42
+ * @parent ---角色头像41至60---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-43
+ * @parent ---角色头像41至60---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-44
+ * @parent ---角色头像41至60---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-45
+ * @parent ---角色头像41至60---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-46
+ * @parent ---角色头像41至60---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-47
+ * @parent ---角色头像41至60---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-48
+ * @parent ---角色头像41至60---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-49
+ * @parent ---角色头像41至60---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-50
+ * @parent ---角色头像41至60---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-51
+ * @parent ---角色头像41至60---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-52
+ * @parent ---角色头像41至60---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-53
+ * @parent ---角色头像41至60---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-54
+ * @parent ---角色头像41至60---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-55
+ * @parent ---角色头像41至60---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-56
+ * @parent ---角色头像41至60---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-57
+ * @parent ---角色头像41至60---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-58
+ * @parent ---角色头像41至60---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-59
+ * @parent ---角色头像41至60---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
+ *
+ * @param 角色头像-60
+ * @parent ---角色头像41至60---
+ * @desc 角色头像的图片资源。与角色编号对应。
+ * @default 
+ * @require 1
+ * @dir img/Map__ui_actorhud/
+ * @type file
  *
  * @help  
  * =============================================================================
- * +++ MOG Actor Hud (v2.0) +++
+ * +++ MOG Actor Hud (v1.9) +++
  * By Moghunter 
- * https://atelierrgss.wordpress.com/
+ * https://mogplugins.wordpress.com/
  * =============================================================================
- * Adiciona uma Hud com os parâmetros do personagem.
+ * 显示玩家信息的固定框。固定框是长期显示的ui窗口，与浮动框不同。
+ * 【现已支持插件关联资源的打包、加密】
  *
- * =============================================================================
- * - REQUIRED FILES
- * =============================================================================
- * Serão necessários os arquivos. (img/actorhud/)
+ * -----------------------------------------------------------------------------
+ * ----设定注意事项
+ * 1.插件的作用域：地图界面。
+ *   添加在地图的ui层。
  *
- * HP_Meter.png
- * HP_Number.png
- * MP_Meter.png
- * MP_Number.png
- * TP_Meter.png
- * TP_Number.png
- * Layout.png
- * Layout2.png 
- * LV_Number.png
- * EXP_Meter.png
- *
- * =============================================================================
- * Para nomear as faces dos battlers basta nomear da seguinte forma.
- *
- * Face_ + ACTOR_ID.png
- *
- * Face_1.png
- * Face_2.png
- * Face_3.png
- * ...
- *
- * =============================================================================
- * - PLUGIN COMMANDS
- * =============================================================================
- * Para ocultar ou apresentar a hud use os códigos abaixo.
- *
- * hide_actor_hud
- * show_actor_hud
+ * -----------------------------------------------------------------------------
+ * ----素材规则
+ * 不流动生命条的长度是资源图片长度。
+ * 流动生命条的长度是资源图片长度的三分之一。
+ * 如果开启了生命条流动，那么生命条的图片会分成3等份，第1份和第3份要
+ * 一模一样，第2份是第1份和第3份的过渡。（其它条与生命条一样）
  * 
- * ============================================================================
- * - WHAT'S  NEW (version 2.0) 
- * ============================================================================
- * - (NEW) - Plugins parameters compatíveis com RM1.5+
- * - (NEW) - Adição da segunda camada de Layout (Overlay). 
- * - (NEW) - Possibilidade de mudar a velocidade de animação do gradient.
- * - (BUG FIX) - Correção de resetar a animação de gradiente ao voltar do menu.
- * - (BUG FIX) - Correção de resetar a transparência ao voltar do menu.    
+ * -----------------------------------------------------------------------------
+ * ----关联文件
+ * 资源路径：img/Map__ui_actorhud （Map后面有两个下划线）
+ * 先确保项目img文件夹下是否有Map__ui_actorhud文件夹。
+ * 要查看所有关联资源文件的插件，可以去看看"插件清单.xlsx"。
+ * 如果没有，需要自己建立。需要配置资源文件：
+ *
+ * 资源-固定框
+ * 资源-生命条
+ * 资源-生命图标
+ * 资源-生命数值
+ * 资源-魔法条
+ * 资源-魔法图标
+ * 资源-魔法数值
+ * 资源-怒气条
+ * 资源-怒气图标
+ * 资源-怒气数值
+ * 资源-经验条
+ * 资源-等级数值
+ *
+ *
+ * 角色头像-1   （角色头像1与编号为1的角色对应。）
+ * 角色头像-2
+ * 角色头像-3
+ * ………
+ *
+ * -----------------------------------------------------------------------------
+ * ----关于生命图标
+ * 生命图标只能显示有限个数的生命值，如果超出，将以满生命值的形式显示。
+ * 能表示的生命上限 ： 跨度 * 种类 * 行 * 列 * 是否半血
+ * 其中：种类设置为2，实际值会减去1，因为第1种表示空血。
+ *       使用半血模式，一个图标将容纳2个生命。所以值为2。
+ * 例如，
+ * 设置：（跨度1）*（种类2）*（10行）*（2列）*（不半血）= 1*1*10*2*1
+ * 该设置将最大显示20的生命上限和当前生命值情况。
+ * 个位数的生命一般用于操作性比较强的游戏，或者解谜。
+ * 设置：（跨度5）*（种类7）*（15行）*（1列）*（半血）= 5*6*15*1*2
+ * 该设置将最大显示900的生命上限和当前生命值情况。
+ * 生命值每5点填满一个槽。如果是半血模式，则每5点填半个槽，每10点填满一个槽。
+ *
+ * 魔法图标和怒气图标和此原理一样。
+ *
+ * -----------------------------------------------------------------------------
+ * ----可选设定
+ * 玩家信息固定框可以通过插件指令进行关闭。
+ *
+ * 插件指令（显示）：show_actor_hud
+ * 插件指令（隐藏）：hide_actor_hud
+ *
+ * -----------------------------------------------------------------------------
+ * ----关于Drill_up优化：
+ * [v1.1]
+ * 使得该插件支持关联资源的打包、加密。
+ * 部署时勾选去除无关文件，本插件中相关的文件不会被去除。
+ * [v1.2]
+ * 添加了生命数值最大显示位选项。
+ * 添加了魔法数值最大显示位选项。
+ * 添加了生命、魔法、怒气数值跨度的选项。
+ * 修复了多行多列生命值显示的bug。
+ * [v1.3]
+ * 把其它值都添加了最大显示位选项。
+ * [v1.4]
+ * 修改了插件分类。
+ * [v1.5]
+ * 修改了插件关联的资源文件夹。
+ * [v1.6]
+ * 添加了最大值编辑的支持。
+ *
  */
- 
+
 //=============================================================================
 // ** PLUGIN PARAMETERS
 //=============================================================================
@@ -819,147 +1404,169 @@
   　Moghunter.parameters = PluginManager.parameters('MOG_ActorHud');
    
     // HUD POSITION
-	Moghunter.ahud_pos_x = Number(Moghunter.parameters['Hud X-Axis'] || 0);
-	Moghunter.ahud_pos_y = Number(Moghunter.parameters['Hud Y-Axis'] || 440);
-	Moghunter.ahud_fade_limit = Number(Moghunter.parameters['Fade Max'] || 90);
-	Moghunter.ahud_layout2_visible = String(Moghunter.parameters['Layout Overlay Visible'] || true);
-	Moghunter.ahud_layout2_x = Number(Moghunter.parameters['Layout Overlay X-Axis'] || 0);
-	Moghunter.ahud_layout2_y = Number(Moghunter.parameters['Layout Overlay Y-Axis'] || 0);
+	Moghunter.ahud_pos_x = Number(Moghunter.parameters['平移-整个固定框 X'] || 0);
+	Moghunter.ahud_pos_y = Number(Moghunter.parameters['平移-整个固定框 Y'] || 440);
+	Moghunter.ahud_fade_limit = Number(Moghunter.parameters['最小透明度'] || 60);
 	
 	// FACE POSITION
-	Moghunter.ahud_face_visible = String(Moghunter.parameters['Face Visible'] || true);
-	Moghunter.ahud_face_shake = String(Moghunter.parameters['Face Shake Animation'] || true);
-	Moghunter.ahud_face_zoom = String(Moghunter.parameters['Face Zoom Animation'] || true);
-	Moghunter.ahud_face_animated = String(Moghunter.parameters['Face Frame Animation'] || false);
-	Moghunter.ahud_face_pos_x = Number(Moghunter.parameters['Face X-Axis'] || 55);
-	Moghunter.ahud_face_pos_y = Number(Moghunter.parameters['Face Y-Axis'] || 100);
-	Moghunter.ahud_face_priority = Number(Moghunter.parameters['Face Priority'] || 1);
+	Moghunter.ahud_face_visible = String(Moghunter.parameters['是否显示头像'] || true);
+	Moghunter.ahud_face_shake = String(Moghunter.parameters['受伤是否震动头像'] || true);
+	Moghunter.ahud_face_zoom = String(Moghunter.parameters['头像是否使用缩放效果'] || true);
+	Moghunter.ahud_face_animated = String(Moghunter.parameters['头像动画帧'] || false);
+	Moghunter.ahud_face_pos_x = Number(Moghunter.parameters['平移-头像 X'] || 55);
+	Moghunter.ahud_face_pos_y = Number(Moghunter.parameters['平移-头像 Y'] || 100);
+	Moghunter.ahud_face_priority = Number(Moghunter.parameters['头像的优先权'] || 1);
 	
 	// NAME POSITION
-	Moghunter.ahud_name_visible = String(Moghunter.parameters['Name Visible'] || true);
-	Moghunter.ahud_name_font_size = Number(Moghunter.parameters['Name Font Size'] || 20);
-	Moghunter.ahud_name_font_bold_size = Number(Moghunter.parameters['Name Bold Size'] || 4);
-	Moghunter.ahud_name_font_italic = String(Moghunter.parameters['Name Font Italic'] || false);	
-	Moghunter.ahud_name_pos_x = Number(Moghunter.parameters['Name X-Axis'] || 5);
-	Moghunter.ahud_name_pos_y = Number(Moghunter.parameters['Name Y-Axis'] || 20);	
-	
+	Moghunter.ahud_name_visible = String(Moghunter.parameters['是否显示角色名'] || true);
+	Moghunter.ahud_name_font_size = Number(Moghunter.parameters['角色名字体大小'] || 20);
+	Moghunter.ahud_name_font_bold_size = Number(Moghunter.parameters['角色名字体粗细'] || 4);
+	Moghunter.ahud_name_font_italic = String(Moghunter.parameters['角色名字体是否为斜体'] || false);	
+	Moghunter.ahud_name_pos_x = Number(Moghunter.parameters['平移-角色名 X'] || 5);
+	Moghunter.ahud_name_pos_y = Number(Moghunter.parameters['平移-角色名 Y'] || 20);	
+		
 	// HP ICON POSITION
-	Moghunter.ahud_hp_icon_visible = String(Moghunter.parameters['HP Icon Visible'] || 'false');
-	Moghunter.ahud_hp_icon_halfMode = String(Moghunter.parameters['HP Icon Half Mode'] || 'false');	
-	Moghunter.ahud_hp_icon_colorMax = Number(Moghunter.parameters['HP Icon Max Colors'] || 2);	 
-	Moghunter.ahud_hp_icon_rows = Number(Moghunter.parameters['HP Icon Max Rows'] || 10);
-	Moghunter.ahud_hp_icon_cols = Number(Moghunter.parameters['HP Icon Max Columns'] || 2);	
-	Moghunter.ahud_hp_icon_pos_x = Number(Moghunter.parameters['HP Icon X-Axis'] || 143);
-	Moghunter.ahud_hp_icon_pos_y = Number(Moghunter.parameters['HP Icon Y-Axis'] || 85);	
-	Moghunter.ahud_hp_icon_space_x = Number(Moghunter.parameters['HP Icon Space X'] || 0);
-	Moghunter.ahud_hp_icon_space_y = Number(Moghunter.parameters['HP Icon Space Y'] || 0);	
-	Moghunter.ahud_hp_icon_zoomAnime = String(Moghunter.parameters['HP Icon Zoom Anime'] || 'true');	
+	Moghunter.ahud_hp_icon_visible = String(Moghunter.parameters['是否显示生命图标'] || 'false');
+	Moghunter.ahud_hp_icon_halfMode = String(Moghunter.parameters['是否使用半血模式'] || 'false');	
+	Moghunter.ahud_hp_icon_colorMax = Number(Moghunter.parameters['生命图标种类最大数量'] || 7);	 
+	Moghunter.ahud_hp_icon_rows = Number(Moghunter.parameters['生命图标列数'] || 20);
+	Moghunter.ahud_hp_icon_cols = Number(Moghunter.parameters['生命图标行数'] || 1);	
+	Moghunter.ahud_hp_icon_pos_x = Number(Moghunter.parameters['平移-生命图标 X'] || 50);
+	Moghunter.ahud_hp_icon_pos_y = Number(Moghunter.parameters['平移-生命图标 Y'] || 20);	
+	Moghunter.ahud_hp_icon_space_x = Number(Moghunter.parameters['生命图标间距 X'] || 0);
+	Moghunter.ahud_hp_icon_space_y = Number(Moghunter.parameters['生命图标间距 Y'] || 0);	
+	Moghunter.ahud_hp_icon_zoomAnime = String(Moghunter.parameters['生命图标是否使用缩放效果'] || 'true');	
 	
 	// MP ICON POSITION
-	Moghunter.ahud_mp_icon_visible = String(Moghunter.parameters['MP Icon Visible'] || 'false');
-	Moghunter.ahud_mp_icon_halfMode = String(Moghunter.parameters['MP Icon Half Mode'] || 'false');	
-	Moghunter.ahud_mp_icon_colorMax = Number(Moghunter.parameters['MP Icon Max Colors'] || 2);	 
-	Moghunter.ahud_mp_icon_rows = Number(Moghunter.parameters['MP Icon Max Rows'] || 10);
-	Moghunter.ahud_mp_icon_cols = Number(Moghunter.parameters['MP Icon Max Columns'] || 2);	
-	Moghunter.ahud_mp_icon_pos_x = Number(Moghunter.parameters['MP Icon X-Axis'] || 143);
-	Moghunter.ahud_mp_icon_pos_y = Number(Moghunter.parameters['MP Icon Y-Axis'] || 125);	
-	Moghunter.ahud_mp_icon_space_x = Number(Moghunter.parameters['MP Icon Space X'] || 0);
-	Moghunter.ahud_mp_icon_space_y = Number(Moghunter.parameters['MP Icon Space Y'] || 0);	
-	Moghunter.ahud_mp_icon_zoomAnime = String(Moghunter.parameters['MP Icon Zoom Anime'] || 'true');	
+	Moghunter.ahud_mp_icon_visible = String(Moghunter.parameters['是否显示魔法图标'] || 'false');
+	Moghunter.ahud_mp_icon_halfMode = String(Moghunter.parameters['是否使用半魔模式'] || 'false');	
+	Moghunter.ahud_mp_icon_colorMax = Number(Moghunter.parameters['魔法图标种类最大数量'] || 7);	 
+	Moghunter.ahud_mp_icon_rows = Number(Moghunter.parameters['魔法图标列数'] || 20);
+	Moghunter.ahud_mp_icon_cols = Number(Moghunter.parameters['魔法图标行数'] || 1);	
+	Moghunter.ahud_mp_icon_pos_x = Number(Moghunter.parameters['平移-魔法图标 X'] || 67);
+	Moghunter.ahud_mp_icon_pos_y = Number(Moghunter.parameters['平移-魔法图标 Y'] || 55);	
+	Moghunter.ahud_mp_icon_space_x = Number(Moghunter.parameters['魔法图标间距 X'] || 0);
+	Moghunter.ahud_mp_icon_space_y = Number(Moghunter.parameters['魔法图标间距 Y'] || 0);	
+	Moghunter.ahud_mp_icon_zoomAnime = String(Moghunter.parameters['魔法图标是否使用缩放效果'] || 'true');	
 
 	// TP ICON POSITION
-	Moghunter.ahud_tp_icon_visible = String(Moghunter.parameters['TP Icon Visible'] || 'false');
-	Moghunter.ahud_tp_icon_halfMode = String(Moghunter.parameters['TP Icon Half Mode'] || 'false');	
-	Moghunter.ahud_tp_icon_colorMax = Number(Moghunter.parameters['TP Icon Max Colors'] || 2);	 
-	Moghunter.ahud_tp_icon_rows = Number(Moghunter.parameters['TP Icon Max Rows'] || 10);
-	Moghunter.ahud_tp_icon_cols = Number(Moghunter.parameters['TP Icon Max Columns'] || 2);	
-	Moghunter.ahud_tp_icon_pos_x = Number(Moghunter.parameters['TP Icon X-Axis'] || 143);
-	Moghunter.ahud_tp_icon_pos_y = Number(Moghunter.parameters['TP Icon Y-Axis'] || 50);	
-	Moghunter.ahud_tp_icon_space_x = Number(Moghunter.parameters['TP Icon Space X'] || 0);
-	Moghunter.ahud_tp_icon_space_y = Number(Moghunter.parameters['TP Icon Space Y'] || 0);	
-	Moghunter.ahud_tp_icon_zoomAnime = String(Moghunter.parameters['TP Icon Zoom Anime'] || 'true');	
+	Moghunter.ahud_tp_icon_visible = String(Moghunter.parameters['是否显示怒气图标'] || 'false');
+	Moghunter.ahud_tp_icon_halfMode = String(Moghunter.parameters['是否使用半怒模式'] || 'false');	
+	Moghunter.ahud_tp_icon_colorMax = Number(Moghunter.parameters['怒气图标种类最大数量'] || 2);	 
+	Moghunter.ahud_tp_icon_rows = Number(Moghunter.parameters['怒气图标列数'] || 10);
+	Moghunter.ahud_tp_icon_cols = Number(Moghunter.parameters['怒气图标行数'] || 2);	
+	Moghunter.ahud_tp_icon_pos_x = Number(Moghunter.parameters['平移-怒气图标 X'] || 143);
+	Moghunter.ahud_tp_icon_pos_y = Number(Moghunter.parameters['平移-怒气图标 Y'] || 50);	
+	Moghunter.ahud_tp_icon_space_x = Number(Moghunter.parameters['怒气图标间距 X'] || 0);
+	Moghunter.ahud_tp_icon_space_y = Number(Moghunter.parameters['怒气图标间距 Y'] || 0);	
+	Moghunter.ahud_tp_icon_zoomAnime = String(Moghunter.parameters['怒气图标是否使用缩放效果'] || 'true');
 	
 	// HP METER POSITION
-	Moghunter.ahud_hp_meter_visible = String(Moghunter.parameters['HP Meter Visible'] || true);
-	Moghunter.ahud_hp_meter_pos_x = Number(Moghunter.parameters['HP Meter X-Axis'] || 143);
-	Moghunter.ahud_hp_meter_pos_y = Number(Moghunter.parameters['HP Meter Y-Axis'] || 85);
-	Moghunter.ahud_hp_meter_rotation = Number(Moghunter.parameters['HP Meter Angle'] || 0);
-	Moghunter.ahud_hp_meter_flow = String(Moghunter.parameters['HP Meter Flow Anime'] || true);
-	Moghunter.ahud_hp_flowSpd = Number(Moghunter.parameters['HP Meter Flow Speed'] || 2); 
+	Moghunter.ahud_hp_meter_visible = String(Moghunter.parameters['是否显示生命条'] || true);
+	Moghunter.ahud_hp_meter_pos_x = Number(Moghunter.parameters['平移-生命条 X'] || 143);
+	Moghunter.ahud_hp_meter_pos_y = Number(Moghunter.parameters['平移-生命条 Y'] || 85);
+	Moghunter.ahud_hp_meter_rotation = Number(Moghunter.parameters['角度-生命条'] || 0);
+	Moghunter.ahud_hp_meter_flow = String(Moghunter.parameters['生命条是否流动'] || true);
 	
 	// HP NUMBER POSITION
-	Moghunter.ahud_hp_number_visible  = String(Moghunter.parameters['HP Number Visible'] || true);
-	Moghunter.ahud_hp_number_align  = Number(Moghunter.parameters['HP Number Align'] || 0);
-	Moghunter.ahud_hp_number_pos_x  = Number(Moghunter.parameters['HP Number X-Axis'] || 270);
-	Moghunter.ahud_hp_number_pos_y  = Number(Moghunter.parameters['HP Number Y-Axis'] || 70);
-	Moghunter.ahud_maxhp_number_visible  = String(Moghunter.parameters['MaxHP Number Visible'] || false);
-	Moghunter.ahud_maxhp_number_pos_x  = Number(Moghunter.parameters['MaxHP Number X-Axis'] || 125);
-	Moghunter.ahud_maxhp_number_pos_y  = Number(Moghunter.parameters['MaxHP Number Y-Axis'] || 13);	
+	Moghunter.ahud_hp_number_visible  = String(Moghunter.parameters['是否显示生命数值'] || true);
+	Moghunter.ahud_hp_number_align  = Number(Moghunter.parameters['生命数值文本对齐方式'] || 0);
+	Moghunter.ahud_hp_number_pos_x  = Number(Moghunter.parameters['平移-生命数值 X'] || 270);
+	Moghunter.ahud_hp_number_pos_y  = Number(Moghunter.parameters['平移-生命数值 Y'] || 70);
+	Moghunter.ahud_maxhp_number_visible  = String(Moghunter.parameters['是否显示最大生命数值'] || false);
+	Moghunter.ahud_maxhp_number_pos_x  = Number(Moghunter.parameters['平移-最大生命数值 X'] || 185);
+	Moghunter.ahud_maxhp_number_pos_y  = Number(Moghunter.parameters['平移-最大生命数值 Y'] || 40);	
 
 	// MP METER POSITION
-	Moghunter.ahud_mp_meter_visible = String(Moghunter.parameters['MP Meter Visible'] || true);
-	Moghunter.ahud_mp_meter_pos_x = Number(Moghunter.parameters['MP Meter X-Axis'] || 160);
-	Moghunter.ahud_mp_meter_pos_y = Number(Moghunter.parameters['MP Meter Y-Axis'] || 115);	
-	Moghunter.ahud_mp_meter_rotation = Number(Moghunter.parameters['MP Meter Angle'] || 0);
-	Moghunter.ahud_mp_meter_flow = String(Moghunter.parameters['MP Meter Flow Anime'] || true);
-	Moghunter.ahud_mp_flowSpd = Number(Moghunter.parameters['MP Meter Flow Speed'] || 2);
+	Moghunter.ahud_mp_meter_visible = String(Moghunter.parameters['是否显示魔法条'] || true);
+	Moghunter.ahud_mp_meter_pos_x = Number(Moghunter.parameters['平移-魔法条 X'] || 160);
+	Moghunter.ahud_mp_meter_pos_y = Number(Moghunter.parameters['平移-魔法条 Y'] || 115);	
+	Moghunter.ahud_mp_meter_rotation = Number(Moghunter.parameters['角度-魔法条'] || 0);
+	Moghunter.ahud_mp_meter_flow = String(Moghunter.parameters['魔法条是否流动'] || true);
 	
 	// MP NUMBER POSITION
-	Moghunter.ahud_mp_number_visible  = String(Moghunter.parameters['MP Number Visible'] || true);
-    Moghunter.ahud_mp_number_align  = Number(Moghunter.parameters['MP Number Align'] || 0);	
-	Moghunter.ahud_mp_number_pos_x  = Number(Moghunter.parameters['MP Number X-Axis'] || 287);
-	Moghunter.ahud_mp_number_pos_y  = Number(Moghunter.parameters['MP Number Y-Axis'] || 100);
-	Moghunter.ahud_maxmp_number_visible  = String(Moghunter.parameters['MaxMP Number Visible'] || false);
-	Moghunter.ahud_maxmp_number_pos_x  = Number(Moghunter.parameters['MaxMP Number X-Axis'] || 196);
-	Moghunter.ahud_maxmp_number_pos_y  = Number(Moghunter.parameters['MaxMP Number Y-Axis'] || 78);	
+	Moghunter.ahud_mp_number_visible  = String(Moghunter.parameters['是否显示魔法数值'] || true);
+	Moghunter.ahud_mp_number_align  = Number(Moghunter.parameters['魔法数值文本对齐方式'] || 0);
+	Moghunter.ahud_mp_number_pos_x  = Number(Moghunter.parameters['平移-魔法数值 X'] || 287);
+	Moghunter.ahud_mp_number_pos_y  = Number(Moghunter.parameters['平移-魔法数值 Y'] || 100);
+	Moghunter.ahud_maxmp_number_visible  = String(Moghunter.parameters['是否显示最大魔法数值'] || false);
+	Moghunter.ahud_maxmp_number_pos_x  = Number(Moghunter.parameters['平移-最大魔法数值 X'] || 196);
+	Moghunter.ahud_maxmp_number_pos_y  = Number(Moghunter.parameters['平移-最大魔法数值 Y'] || 78);	
 
 	// TP METER POSITION
-	Moghunter.ahud_tp_meter_visible = String(Moghunter.parameters['TP Meter Visible'] || true);
-	Moghunter.ahud_tp_meter_pos_x = Number(Moghunter.parameters['TP Meter X-Axis'] || 143);
-	Moghunter.ahud_tp_meter_pos_y = Number(Moghunter.parameters['TP Meter Y-Axis'] || 145);	
-	Moghunter.ahud_tp_meter_rotation = Number(Moghunter.parameters['TP Meter Angle'] || 0);
-	Moghunter.ahud_tp_meter_flow = String(Moghunter.parameters['TP Meter Flow Anime'] || false);
-	Moghunter.ahud_tp_flowSpd = Number(Moghunter.parameters['TP Meter Flow Speed'] || 2);
+	Moghunter.ahud_tp_meter_visible = String(Moghunter.parameters['是否显示怒气条'] || true);
+	Moghunter.ahud_tp_meter_pos_x = Number(Moghunter.parameters['平移-怒气条 X'] || 143);
+	Moghunter.ahud_tp_meter_pos_y = Number(Moghunter.parameters['平移-怒气条 Y'] || 145);	
+	Moghunter.ahud_tp_meter_rotation = Number(Moghunter.parameters['角度-怒气条'] || 0);
+	Moghunter.ahud_tp_meter_flow = String(Moghunter.parameters['怒气条是否流动'] || false);
 	
 	// TP NUMBER POSITION
-	Moghunter.ahud_tp_number_visible  = String(Moghunter.parameters['TP Number Visible'] || true);
-	Moghunter.ahud_tp_number_align  = Number(Moghunter.parameters['TP Number Align'] || 0);	
-	Moghunter.ahud_tp_number_pos_x  = Number(Moghunter.parameters['TP Number X-Axis'] || 270);
-	Moghunter.ahud_tp_number_pos_y  = Number(Moghunter.parameters['TP Number Y-Axis'] || 130);
-	Moghunter.ahud_maxtp_number_visible  = String(Moghunter.parameters['MaxTP Number Visible'] || false);
-	Moghunter.ahud_maxtp_number_pos_x  = Number(Moghunter.parameters['MaxTP Number X-Axis'] || 185);
-	Moghunter.ahud_maxtp_number_pos_y  = Number(Moghunter.parameters['MaxTP Number Y-Axis'] || 116);	
-
-	// Level NUMBER POSITION
-	Moghunter.ahud_level_number_visible  = String(Moghunter.parameters['Level Number Visible'] || true);
-	Moghunter.ahud_level_number_align  = Number(Moghunter.parameters['Level Number Align'] || 1);	
-	Moghunter.ahud_level_number_pos_x  = Number(Moghunter.parameters['Level Number X-Axis'] || 65);
-	Moghunter.ahud_level_number_pos_y  = Number(Moghunter.parameters['Level Number Y-Axis'] || 153);
+	Moghunter.ahud_tp_number_visible  = String(Moghunter.parameters['是否显示怒气数值'] || true);
+	Moghunter.ahud_tp_number_align  = Number(Moghunter.parameters['怒气数值文本对齐方式'] || 0);
+	Moghunter.ahud_tp_number_pos_x  = Number(Moghunter.parameters['平移-怒气数值 X'] || 270);
+	Moghunter.ahud_tp_number_pos_y  = Number(Moghunter.parameters['平移-怒气数值 Y'] || 130);
+	Moghunter.ahud_maxtp_number_visible  = String(Moghunter.parameters['是否显示最大怒气数值'] || false);
+	Moghunter.ahud_maxtp_number_pos_x  = Number(Moghunter.parameters['平移-最大怒气数值 X'] || 185);
+	Moghunter.ahud_maxtp_number_pos_y  = Number(Moghunter.parameters['平移-最大怒气数值 Y'] || 116);	
 
     // EXP METER POSITION
-	Moghunter.ahud_exp_meter_visible = String(Moghunter.parameters['EXP Meter Visible'] || true);
-	Moghunter.ahud_exp_meter_pos_x = Number(Moghunter.parameters['EXP Meter X-Axis'] || 127);
-	Moghunter.ahud_exp_meter_pos_y = Number(Moghunter.parameters['EXP Meter Y-Axis'] || 173);	
-	Moghunter.ahud_exp_meter_rotation = Number(Moghunter.parameters['EXP Meter Angle'] || 0);
+	Moghunter.ahud_exp_meter_visible = String(Moghunter.parameters['是否显示经验条'] || true);
+	Moghunter.ahud_exp_meter_pos_x = Number(Moghunter.parameters['平移-经验条 X'] || 127);
+	Moghunter.ahud_exp_meter_pos_y = Number(Moghunter.parameters['平移-经验条 Y'] || 173);	
+	Moghunter.ahud_exp_meter_rotation = Number(Moghunter.parameters['角度-经验条'] || 0);
 	
-	// STATES POSITION
-	Moghunter.ahud_states_visible = String(Moghunter.parameters['States Visible'] || true);
-	Moghunter.ahud_states_pos_x = Number(Moghunter.parameters['States X-Axis'] || 5);
-	Moghunter.ahud_states_pos_y = Number(Moghunter.parameters['States Y-Axis'] || 64);	
+	
+	// Level NUMBER POSITION
+	Moghunter.ahud_level_number_visible  = String(Moghunter.parameters['是否显示等级数值'] || true);
+	Moghunter.ahud_level_number_pos_x  = Number(Moghunter.parameters['平移-等级数值 X'] || 65);
+	Moghunter.ahud_level_number_pos_y  = Number(Moghunter.parameters['平移-等级数值 Y'] || 153);
+	Moghunter.ahud_level_number_align  = Number(Moghunter.parameters['等级数值文本对齐方式'] || 1);
 
-    Moghunter.ahud_hudvisible = String(Moghunter.parameters['Initial Visible'] || "false");	
+	// STATES POSITION
+	Moghunter.ahud_states_visible = String(Moghunter.parameters['是否显示状态'] || true);
+	Moghunter.ahud_states_pos_x = Number(Moghunter.parameters['平移-状态 X'] || 5);
+	Moghunter.ahud_states_pos_y = Number(Moghunter.parameters['平移-状态 Y'] || 64);	
+	
+    Moghunter.ahud_max_hp_limit = Number(Moghunter.parameters['生命数值最大显示位'] || 6);
+    Moghunter.ahud_max_mp_limit = Number(Moghunter.parameters['魔法数值最大显示位'] || 6);
+    Moghunter.ahud_max_tp_limit = Number(Moghunter.parameters['怒气数值最大显示位'] || 3);
+    Moghunter.ahud_max_lv_limit = Number(Moghunter.parameters['等级数值最大显示位'] || 4);
+    Moghunter.ahud_hp_over = Number(Moghunter.parameters['生命图标值跨度'] || 1);
+    Moghunter.ahud_mp_over = Number(Moghunter.parameters['魔法图标值跨度'] || 1);
+    Moghunter.ahud_tp_over = Number(Moghunter.parameters['怒气图标值跨度'] || 1);
+
+    Moghunter.ahud_hudvisible = String(Moghunter.parameters['是否初始显示'] || "false");	
     Moghunter.ahud_smartFade = String(Moghunter.parameters['Smart Fade'] || "true");	
-	Moghunter.ahud_autoFade = String(Moghunter.parameters['Auto Fade'] || "true");
-		
+	Moghunter.ahud_autoFade = String(Moghunter.parameters['Auto Fade'] || "true");	
+
+	Moghunter.src_ah_Layout = String(Moghunter.parameters['资源-固定框']);
+	Moghunter.src_ah_HP_Meter = String(Moghunter.parameters['资源-生命条']);
+	Moghunter.src_ah_HP_Icon = String(Moghunter.parameters['资源-生命图标']);
+	Moghunter.src_ah_HP_Number = String(Moghunter.parameters['资源-生命数值']);
+	Moghunter.src_ah_MP_Meter = String(Moghunter.parameters['资源-魔法条']);
+	Moghunter.src_ah_MP_Icon = String(Moghunter.parameters['资源-魔法图标']);
+	Moghunter.src_ah_MP_Number = String(Moghunter.parameters['资源-魔法数值']);
+	Moghunter.src_ah_TP_Meter = String(Moghunter.parameters['资源-怒气条']);
+	Moghunter.src_ah_TP_Icon = String(Moghunter.parameters['资源-怒气图标']);
+	Moghunter.src_ah_TP_Number = String(Moghunter.parameters['资源-怒气数值']);
+	Moghunter.src_ah_EXP_Meter = String(Moghunter.parameters['资源-经验条']);
+	Moghunter.src_ah_LV_Number = String(Moghunter.parameters['资源-等级数值']);
+	
+	Moghunter.ahudFace_list_length = 60;
+	Moghunter.ahudFace_list = {};
+	for (var i = 1; i <= Moghunter.ahudFace_list_length ; i++ ) {
+		Moghunter.ahudFace_list[i] = Moghunter.parameters['角色头像-' + String(i) ];
+	};
+	
 //=============================================================================
 // ** ImageManager
 //=============================================================================
 
 //==============================
-// * Actor Hud
+// * BHud
 //==============================
 ImageManager.loadAHud = function(filename) {
-    return this.loadBitmap('img/actorhud/', filename, 0, true);
+    return this.loadBitmap('img/Map__ui_actorhud/', filename, 0, true);
 };			
 
 //=============================================================================
@@ -977,7 +1584,6 @@ Game_System.prototype.initialize = function() {
 	this._ahud_smartFade = String(Moghunter.ahud_smartFade) === "true" ? true : false;
 	this._ahud_autoFade = String(Moghunter.ahud_autoFade) === "true" ? true : false;
 	this._ahud_opacity = 0;
-	this._ahud_flowData = [0,0,0];
 };
 
 //=============================================================================
@@ -1051,6 +1657,7 @@ Game_Interpreter.prototype.pluginCommand = function(command, args) {
 //==============================
 // ** create Hud Field
 //==============================
+
 Scene_Base.prototype.createHudField = function() {
 	this._hudField = new Sprite();
 	this._hudField.z = 10;
@@ -1102,6 +1709,7 @@ Actor_Hud.prototype.constructor = Actor_Hud;
 // * Initialize
 //==============================
 Actor_Hud.prototype.initialize = function(hud_id) {
+
     Sprite.prototype.initialize.call(this);
 	this.visible = false;	
     this._data_initial_ref = [0,true];
@@ -1109,11 +1717,7 @@ Actor_Hud.prototype.initialize = function(hud_id) {
 	this._hud_size = [-1,-1,-1,-1];
     this.base_parameter_clear();
     this.load_img();
-	if (!$gameSystem._ahud_visible) {
-		$gameSystem._ahud_opacity = 0;
-		this.opacity = 0
-	};
-	this.opacity = $gameSystem._ahud_opacity;
+	if (!$gameSystem._ahud_visible) {this.opacity = 0};
 	this.update();
 };
 
@@ -1121,23 +1725,22 @@ Actor_Hud.prototype.initialize = function(hud_id) {
 // * Load Img
 //==============================
 Actor_Hud.prototype.load_img = function() {
-	this._layout_img = ImageManager.loadAHud("Layout");
+	this._layout_img = ImageManager.loadAHud(Moghunter.src_ah_Layout);
 	this._state_img = ImageManager.loadSystem("IconSet");
-	if (String(Moghunter.ahud_layout2_visible) == "true") {this._layout2_img = ImageManager.loadAHud("Layout2")};
-	if (String(Moghunter.ahud_hp_meter_visible) == "true") {this._hp_meter_img = ImageManager.loadAHud("HP_Meter")};
-	if (String(Moghunter.ahud_mp_meter_visible) == "true") {this._mp_meter_img = ImageManager.loadAHud("MP_Meter")};
-	if (String(Moghunter.ahud_tp_meter_visible) == "true") {this._tp_meter_img = ImageManager.loadAHud("TP_Meter")};	
-	if (String(Moghunter.ahud_hp_icon_visible) == "true") {this._hp_icon_img = ImageManager.loadAHud("HP_Icon")};
-	if (String(Moghunter.ahud_mp_icon_visible) == "true") {this._mp_icon_img = ImageManager.loadAHud("MP_Icon")};
-	if (String(Moghunter.ahud_tp_icon_visible) == "true") {this._tp_icon_img = ImageManager.loadAHud("TP_Icon")};	
-	if (String(Moghunter.ahud_exp_meter_visible) == "true") {this._exp_meter_img = ImageManager.loadAHud("EXP_Meter")};
-	if (String(Moghunter.ahud_hp_number_visible) == "true") {this._hp_number_img = ImageManager.loadAHud("HP_Number")};
-	if (String(Moghunter.ahud_mp_number_visible) == "true") {this._mp_number_img = ImageManager.loadAHud("MP_Number")};
-	if (String(Moghunter.ahud_tp_number_visible) == "true") {this._tp_number_img = ImageManager.loadAHud("TP_Number")};
-	if (String(Moghunter.ahud_level_number_visible) == "true") {this._level_number_img = ImageManager.loadAHud("LV_Number")};
-	if (String(Moghunter.ahud_maxhp_number_visible) == "true") {this._maxhp_number_img = ImageManager.loadAHud("HP_Number2")};
-	if (String(Moghunter.ahud_maxmp_number_visible) == "true") {this._maxmp_number_img = ImageManager.loadAHud("MP_Number2")};
-	if (String(Moghunter.ahud_maxtp_number_visible) == "true") {this._maxtp_number_img = ImageManager.loadAHud("TP_Number2")};	
+	if (String(Moghunter.ahud_hp_meter_visible) == "true") {this._hp_meter_img = ImageManager.loadAHud(Moghunter.src_ah_HP_Meter);};
+	if (String(Moghunter.ahud_hp_icon_visible) == "true") {this._hp_icon_img = ImageManager.loadAHud(Moghunter.src_ah_HP_Icon)};
+	if (String(Moghunter.ahud_mp_meter_visible) == "true") {this._mp_meter_img = ImageManager.loadAHud(Moghunter.src_ah_MP_Meter);};
+	if (String(Moghunter.ahud_mp_icon_visible) == "true") {this._mp_icon_img = ImageManager.loadAHud(Moghunter.src_ah_MP_Icon)};
+	if (String(Moghunter.ahud_tp_meter_visible) == "true") {this._tp_meter_img = ImageManager.loadAHud(Moghunter.src_ah_TP_Meter);};
+	if (String(Moghunter.ahud_tp_icon_visible) == "true") {this._tp_icon_img = ImageManager.loadAHud(Moghunter.src_ah_TP_Icon)};	
+	if (String(Moghunter.ahud_exp_meter_visible) == "true") {this._exp_meter_img = ImageManager.loadAHud(Moghunter.src_ah_EXP_Meter);};
+	if (String(Moghunter.ahud_hp_number_visible) == "true") {this._hp_number_img = ImageManager.loadAHud(Moghunter.src_ah_HP_Number);};
+	if (String(Moghunter.ahud_mp_number_visible) == "true") {this._mp_number_img = ImageManager.loadAHud(Moghunter.src_ah_MP_Number);};
+	if (String(Moghunter.ahud_tp_number_visible) == "true") {this._tp_number_img = ImageManager.loadAHud(Moghunter.src_ah_TP_Number);};
+	if (String(Moghunter.ahud_level_number_visible) == "true") {this._level_number_img = ImageManager.loadAHud(Moghunter.src_ah_LV_Number);};
+	if (String(Moghunter.ahud_maxhp_number_visible) == "true") {this._maxhp_number_img = ImageManager.loadAHud(Moghunter.src_ah_HP_Number);};
+	if (String(Moghunter.ahud_maxmp_number_visible) == "true") {this._maxmp_number_img = ImageManager.loadAHud(Moghunter.src_ah_MP_Number);};
+	if (String(Moghunter.ahud_maxtp_number_visible) == "true") {this._maxtp_number_img = ImageManager.loadAHud(Moghunter.src_ah_TP_Number);};	
 };
 
 //==============================
@@ -1170,9 +1773,6 @@ Actor_Hud.prototype.base_parameter_clear = function() {
 	 this._states_old = [];
 	 this._states_data = [0,0,0];
 	 this._active = false;
-	 this._hp_flow_speed = Moghunter.ahud_hp_flowSpd * 0.1;
-	 this._mp_flow_speed = Moghunter.ahud_mp_flowSpd * 0.1;
-	 this._tp_flow_speed = Moghunter.ahud_tp_flowSpd * 0.1;
 	 this._hud_size = [0,0];
 };
 
@@ -1191,6 +1791,7 @@ Actor_Hud.prototype.need_refreh_bhud = function() {
 Actor_Hud.prototype.refresh_bhud = function() {
 	 this._data_initial_ref[1] = false;
 	 this._battler = $gameParty.members()[0];
+
 	 this._hud_size = [0,0];
 	 this.base_parameter_clear();
 	 this.create_base_sprites();
@@ -1229,6 +1830,7 @@ Actor_Hud.prototype.set_hud_position = function() {
 //==============================
 Actor_Hud.prototype.update = function() {
     Sprite.prototype.update.call(this);	
+
 	if (this.need_refreh_bhud()) {this.refresh_bhud()};
     if (!this._battler) {this.visible = false;return};
 	if (!this._layout_img.isReady()) {return};
@@ -1260,8 +1862,7 @@ Actor_Hud.prototype.create_sprites = function() {
 	this.create_mp_icon();
     this.create_tp_icon();
 	this.create_exp_meter();
-	if (this._layout2_img) {this.create_layout2()};
-	this.create_hp_number();
+	this.create_hp_number();	
 	this.create_maxhp_number();
 	this.create_mp_number();	
     this.create_maxmp_number();
@@ -1328,6 +1929,7 @@ Actor_Hud.prototype.needFade = function() {
 	if ($gamePlayer.screen_realX() > this._hud_size[2]) {return false};
 	if ($gamePlayer.screen_realY() < this._hud_size[1]) {return false};
 	if ($gamePlayer.screen_realY() > this._hud_size[3]) {return false};	
+
     return true;
 };
 
@@ -1375,12 +1977,15 @@ Actor_Hud.prototype.refresh_number = function(sprites,value,img_data,x,center) {
 	   var n = Number(numbers[i]);
 	   sprites[i].setFrame(n * img_data[2], 0, img_data[2], img_data[1]);
 	   sprites[i].visible = true;
+
 	   var nx = -(img_data[2] * i) + (img_data[2] * numbers.length);
+
 	   if (sprites.align === 1) {
 	      var xi = (img_data[2] * numbers.length) / 2;		   
 		   sprites[i].x = x + xi - nx;
        } else if (sprites.align === 2) {
 	       var xi = img_data[2] * numbers.length;		   
+
 		   sprites[i].x = x + xi - nx;
    	   } else {
 		   sprites[i].x = x - nx;
@@ -1421,18 +2026,6 @@ Actor_Hud.prototype.create_layout = function() {
 	this._layout = new Sprite(this._layout_img);
 	this.addChild(this._layout);
 };
-
-//==============================
-// * Create Layout 2
-//==============================
-Actor_Hud.prototype.create_layout2 = function() {
-	this.removeChild(this._layout2);
-	if (!this._battler) {return};
-	this._layout2 = new Sprite(this._layout2_img);
-	this._layout2.x = Moghunter.ahud_layout2_x;
-	this._layout2.y = Moghunter.ahud_layout2_y;
-	this.addChild(this._layout2);
-};
 	
 //==============================
 // * Create Face
@@ -1441,7 +2034,7 @@ Actor_Hud.prototype.create_face = function() {
 	if (String(Moghunter.ahud_face_visible) != "true") {return};
 	this.removeChild(this._face);
 	if (!this._battler) {return};	
-	this._face = new Sprite(ImageManager.loadAHud("Face_" + this._battler._actorId));
+	this._face = new Sprite(ImageManager.loadAHud(Moghunter.ahudFace_list[this._battler._actorId]));
 	this._face.anchor.x = 0.5;
 	this._face.anchor.y = 0.5;
 	this._face_data = [0,0,false,false,false,-1];
@@ -1583,7 +2176,6 @@ Actor_Hud.prototype.create_hp_icon = function() {
 	this._hp_icons = [];
 	this._hp_icons.iconMode = String(Moghunter.ahud_hp_icon_halfMode) == "true" ? true : false;
 	this._hp_iconsB = [];
-
 	this._hp_iconsB.iconMode = this._hp_icons.iconMode;
 	this._hp_IconZoomAnime = String(Moghunter.ahud_hp_icon_zoomAnime) == "true" ? true : false;
 	var colors = Math.max(Moghunter.ahud_hp_icon_colorMax, 2)
@@ -1665,7 +2257,6 @@ Actor_Hud.prototype.create_mp_icon = function() {
 		 this._mp_icons[i].anchor.x = 0.5;
 		 this._mp_icons[i].anchor.y = 0.5;		 
 		 this._mp_icons[i].rows = Moghunter.ahud_mp_icon_rows;
-
 		 this._mp_icons[i].cols = Moghunter.ahud_mp_icon_cols;
 		 this._mp_icons[i].org = [this._pos_x + Moghunter.ahud_mp_icon_pos_x - cw,this._pos_y + Moghunter.ahud_mp_icon_pos_y - ch];
 		 this._mp_icons[i].spc = [Moghunter.ahud_mp_icon_space_x,Moghunter.ahud_mp_icon_space_y];
@@ -1820,7 +2411,7 @@ Actor_Hud.prototype.refreshIconNormalMode = function(sprites,image,par,par_max,m
 	   var icon = sprites[i];
        var cw = image.width / icon.colorMax;
 	   var ch = image.height;	   
-	   var iconMax = icon.rows;
+	   var iconMax = icon.rows * icon.cols;
 	   var colorIndex = Math.floor(par / iconMax);
 	   var colorMax = icon.colorMax;
 	   var avaliableValue = Math.floor(colorIndex * iconMax)
@@ -1958,7 +2549,7 @@ Actor_Hud.prototype.create_hp_number = function() {
 						  this._pos_x + Moghunter.ahud_hp_number_pos_x,
 						  this._pos_y + Moghunter.ahud_hp_number_pos_y,
 						  ];
-	for (var i = 0; i < 5; i++) {
+	for (var i = 0; i < Moghunter.ahud_max_hp_limit; i++) {
 	   this._hp_number[i] = new Sprite(this._hp_number_img);
 	   this._hp_number[i].visible = false;
 	   this._hp_number[i].x = this._hp_img_data[4];
@@ -1983,7 +2574,7 @@ Actor_Hud.prototype.create_maxhp_number = function() {
 						  this._pos_x + Moghunter.ahud_maxhp_number_pos_x,
 						  this._pos_y + Moghunter.ahud_maxhp_number_pos_y,
 						  ];
-	for (var i = 0; i < 5; i++) {
+	for (var i = 0; i < Moghunter.ahud_max_hp_limit; i++) {
 	   this._maxhp_number[i] = new Sprite(this._maxhp_number_img);
 	   this._maxhp_number[i].visible = false;
 	   this._maxhp_number[i].x = this._maxhp_img_data[4];
@@ -1999,18 +2590,20 @@ Actor_Hud.prototype.create_maxhp_number = function() {
 //==============================
 Actor_Hud.prototype.update_hp = function() {
 	if (this._hp_meter_blue) {
+		this._hp_meter_blue.opacity += 15;
+		this._hp_meter_red.opacity += 15;
 		if(this._hp_flow[0]) {
 		   if (this._hp_old[1] != this._battler.mhp) {
 		       this._hp_old = [this._battler.hp,this._battler.mhp];
-			   this.refresh_meter_flow(this._hp_meter_red,this._battler.hp,this._battler.mhp,1,$gameSystem._ahud_flowData[0]);
+			   this.refresh_meter_flow(this._hp_meter_red,this._battler.hp,this._battler.mhp,1,this._hp_flow[1]);
 		   };					
-		   this.refresh_meter_flow(this._hp_meter_blue,this._battler.hp,this._battler.mhp,0,$gameSystem._ahud_flowData[0]);
+		   this.refresh_meter_flow(this._hp_meter_blue,this._battler.hp,this._battler.mhp,0,this._hp_flow[1]);
 	   	   var dif_meter = this.update_dif(this._hp_old_ani[0],this._battler.hp,160)
 		   if (this._hp_old_ani[0] != dif_meter) {this._hp_old_ani[0] = dif_meter;
-	       this.refresh_meter_flow(this._hp_meter_red,this._hp_old_ani[0],this._battler.mhp,1,$gameSystem._ahud_flowData[0]);
+	       this.refresh_meter_flow(this._hp_meter_red,this._hp_old_ani[0],this._battler.mhp,1,this._hp_flow[1]);
 		   };
-		   $gameSystem._ahud_flowData[0] += this._hp_flow_speed;
-		   if ($gameSystem._ahud_flowData[0] > this._hp_flow[3]) {$gameSystem._ahud_flowData[0] = 0};
+		   this._hp_flow[1] += 2;
+		   if (this._hp_flow[1] > this._hp_flow[3]) {this._hp_flow[1] = 0};		   
    	    }
 		else {
 		   if (this.need_refresh_parameter(0)) {
@@ -2032,11 +2625,13 @@ Actor_Hud.prototype.update_hp = function() {
 		this.refresh_number(this._maxhp_number,this._maxhp_number_old,this._maxhp_img_data,this._maxhp_img_data[4],0);};
 	};
 	if (this._hp_icons) {
-		if (this._hp_icon_old[0] != this._battler.hp || this._hp_icon_old[1] != this._battler.mhp) {
-		    this._hp_icon_old[0] = this._battler.hp;
-			this._hp_icon_old[1] = this._battler.mhp;
-			this.refresh_icons(this._hp_iconsB,this._hp_icon_img,this._battler.hp,this._battler.mhp,0);
-	        this.refresh_icons(this._hp_icons,this._hp_icon_img,this._battler.hp,this._battler.mhp,1);
+		var a_hp = Math.floor( this._battler.hp/Moghunter.ahud_hp_over + 0.5 );
+		var a_mhp = Math.floor( this._battler.mhp/Moghunter.ahud_hp_over + 0.5 );
+		if (this._hp_icon_old[0] != a_hp || this._hp_icon_old[1] != a_mhp) {
+		    this._hp_icon_old[0] = a_hp;
+			this._hp_icon_old[1] = a_mhp;
+			this.refresh_icons(this._hp_iconsB,this._hp_icon_img, a_hp, a_mhp,0);
+	        this.refresh_icons(this._hp_icons,this._hp_icon_img, a_hp, a_mhp,1);
 		};
 		if (this._hp_IconZoomAnime) {this.updateIconZoomAnime(this._hp_icons)};
     };
@@ -2084,7 +2679,7 @@ Actor_Hud.prototype.create_mp_number = function() {
 						  this._pos_x + Moghunter.ahud_mp_number_pos_x,
 						  this._pos_y + Moghunter.ahud_mp_number_pos_y,
 						  ];
-	for (var i = 0; i < 5; i++) {
+	for (var i = 0; i < Moghunter.ahud_max_mp_limit; i++) {
 	   this._mp_number[i] = new Sprite(this._mp_number_img);
 	   this._mp_number[i].visible = false;
 	   this._mp_number[i].x = this._mp_img_data[4];
@@ -2109,7 +2704,7 @@ Actor_Hud.prototype.create_maxmp_number = function() {
 						  this._pos_x + Moghunter.ahud_maxmp_number_pos_x,
 						  this._pos_y + Moghunter.ahud_maxmp_number_pos_y,
 						  ];
-	for (var i = 0; i < 5; i++) {
+	for (var i = 0; i < Moghunter.ahud_max_mp_limit; i++) {
 	   this._maxmp_number[i] = new Sprite(this._maxmp_number_img);
 	   this._maxmp_number[i].visible = false;
 	   this._maxmp_number[i].x = this._maxmp_img_data[4];
@@ -2125,18 +2720,20 @@ Actor_Hud.prototype.create_maxmp_number = function() {
 //==============================
 Actor_Hud.prototype.update_mp = function() {
 	if (this._mp_meter_blue) {
+     	this._mp_meter_blue.opacity += 15;
+	    this._mp_meter_red.opacity += 15;			
 		if(this._mp_flow[0]) {
 		   if (this._mp_old[1] != this._battler.mmp) {
 		       this._mp_old = [this._battler.mp,this._battler.mmp];
-			   this.refresh_meter_flow(this._mp_meter_red,this._battler.mp,this._battler.mmp,1,$gameSystem._ahud_flowData[1]);
+			   this.refresh_meter_flow(this._mp_meter_red,this._battler.mp,this._battler.mmp,1,this._mp_flow[1]);
 		   };			
-		   this.refresh_meter_flow(this._mp_meter_blue,this._battler.mp,this._battler.mmp,0,$gameSystem._ahud_flowData[1]);
+		   this.refresh_meter_flow(this._mp_meter_blue,this._battler.mp,this._battler.mmp,0,this._mp_flow[1]);
 	   	   var dif_meter = this.update_dif(this._mp_old_ani[0],this._battler.mp,160);
 		   if (this._mp_old_ani[0] != dif_meter) {this._mp_old_ani[0] = dif_meter;
-	       this.refresh_meter_flow(this._mp_meter_red,this._mp_old_ani[0],this._battler.mmp,1,$gameSystem._ahud_flowData[1]);
+	       this.refresh_meter_flow(this._mp_meter_red,this._mp_old_ani[0],this._battler.mmp,1,this._mp_flow[1]);
 		   };
-		   $gameSystem._ahud_flowData[1] += this._mp_flow_speed;
-		   if ($gameSystem._ahud_flowData[1] > this._mp_flow[3]) {$gameSystem._ahud_flowData[1] = 0};		   
+		   this._mp_flow[1] += 2;
+		   if (this._mp_flow[1] > this._mp_flow[3]) {this._mp_flow[1] = 0};		   
    	    }
 		else {		
 			if (this.need_refresh_parameter(1)) {
@@ -2156,13 +2753,17 @@ Actor_Hud.prototype.update_mp = function() {
 	if (this._maxmp_number) {
 		if (this._maxmp_number_old != this._battler.mmp) {this._maxmp_number_old = this._battler.mmp;
 		this.refresh_number(this._maxmp_number,this._maxmp_number_old,this._maxmp_img_data,this._maxmp_img_data[4],0);};
+
+
 	};
 	if (this._mp_icons) {
-		if (this._mp_icon_old[0] != this._battler.mp || this._mp_icon_old[1] != this._battler.mmp) {
-		    this._mp_icon_old[0] = this._battler.mp;
-			this._mp_icon_old[1] = this._battler.mmp;
-			this.refresh_icons(this._mp_iconsB,this._mp_icon_img,this._battler.mp,this._battler.mmp,0);
-	        this.refresh_icons(this._mp_icons,this._mp_icon_img,this._battler.mp,this._battler.mmp,1);
+		var a_mp = Math.floor( this._battler.mp/Moghunter.ahud_mp_over + 0.5 );
+		var a_mmp = Math.floor( this._battler.mmp/Moghunter.ahud_mp_over + 0.5 );
+		if (this._mp_icon_old[0] != a_mp || this._mp_icon_old[1] != a_mmp) {
+		    this._mp_icon_old[0] = a_mp;
+			this._mp_icon_old[1] = a_mmp;
+			this.refresh_icons(this._mp_iconsB,this._mp_icon_img, a_mp, a_mmp,0);
+	        this.refresh_icons(this._mp_icons,this._mp_icon_img, a_mp, a_mmp,1);
 		};
 		if (this._mp_IconZoomAnime) {this.updateIconZoomAnime(this._mp_icons)};
     };	
@@ -2210,7 +2811,7 @@ Actor_Hud.prototype.create_tp_number = function() {
 						  this._pos_x + Moghunter.ahud_tp_number_pos_x,
 						  this._pos_y + Moghunter.ahud_tp_number_pos_y,
 						  ];
-	for (var i = 0; i < 5; i++) {
+	for (var i = 0; i < Moghunter.ahud_max_tp_limit; i++) {
 	   this._tp_number[i] = new Sprite(this._tp_number_img);
 	   this._tp_number[i].visible = false;
 	   this._tp_number[i].x = this._tp_img_data[4];
@@ -2235,7 +2836,7 @@ Actor_Hud.prototype.create_maxtp_number = function() {
 						  this._pos_x + Moghunter.ahud_maxtp_number_pos_x,
 						  this._pos_y + Moghunter.ahud_maxtp_number_pos_y,
 						  ];
-	for (var i = 0; i < 5; i++) {
+	for (var i = 0; i < Moghunter.ahud_max_tp_limit; i++) {
 	   this._maxtp_number[i] = new Sprite(this._maxtp_number_img);
 	   this._maxtp_number[i].visible = false;
 	   this._maxtp_number[i].x = this._maxtp_img_data[4];
@@ -2251,18 +2852,20 @@ Actor_Hud.prototype.create_maxtp_number = function() {
 //==============================
 Actor_Hud.prototype.update_tp = function() {
 	if (this._tp_meter_blue) {
+		this._tp_meter_blue.opacity += 15;
+		this._tp_meter_red.opacity += 15;
 		if(this._tp_flow[0]) {
 		   if (this._tp_old[1] != this._battler.maxTp()) {
 		       this._tp_old = [this._battler.tp,this._battler.maxTp()];
-			   this.refresh_meter_flow(this._tp_meter_red,this._battler.tp,this._battler.maxTp(),1,$gameSystem._ahud_flowData[2]);
+			   this.refresh_meter_flow(this._tp_meter_red,this._battler.tp,this._battler.maxTp(),1,this._tp_flow[1]);
 		   };				
-		   this.refresh_meter_flow(this._tp_meter_blue,this._battler.tp,this._battler.maxTp(),0,$gameSystem._ahud_flowData[2]);
+		   this.refresh_meter_flow(this._tp_meter_blue,this._battler.tp,this._battler.maxTp(),0,this._tp_flow[1]);
 	   	   var dif_meter = this.update_dif(this._tp_old_ani[0],this._battler.tp,160)
 		   if (this._tp_old_ani[0] != dif_meter) {this._tp_old_ani[0] = dif_meter;
-	       this.refresh_meter_flow(this._tp_meter_red,this._tp_old_ani[0],this._battler.maxTp(),1,$gameSystem._ahud_flowData[2]);
+	       this.refresh_meter_flow(this._tp_meter_red,this._tp_old_ani[0],this._battler.maxTp(),1,this._tp_flow[1]);
 		   };
-		   $gameSystem._ahud_flowData[2] += this._tp_flow_speed;
-		   if ($gameSystem._ahud_flowData[2] > this._tp_flow[3]) {$gameSystem._ahud_flowData[2] = 0};		   
+		   this._tp_flow[1] += 2;
+		   if (this._tp_flow[1] > this._tp_flow[3]) {this._tp_flow[1] = 0};		   
    	    }
 		else {	
 			if (this.need_refresh_parameter(2)) {
@@ -2280,11 +2883,13 @@ Actor_Hud.prototype.update_tp = function() {
 		this.refresh_number(this._tp_number,this._tp_number_old,this._tp_img_data,this._tp_img_data[4],0);};
 	};
 	if (this._tp_icons) {
-		if (this._tp_icon_old[0] != this._battler.tp || this._tp_icon_old[1] != this._battler.maxTp()) {
-		    this._tp_icon_old[0] = this._battler.tp;
-			this._tp_icon_old[1] = this._battler.maxTp();
-			this.refresh_icons(this._tp_iconsB,this._tp_icon_img,this._battler.tp,this._battler.maxTp(),0);
-	        this.refresh_icons(this._tp_icons,this._tp_icon_img,this._battler.tp,this._battler.maxTp(),1);
+		var a_tp = Math.floor( this._battler.tp/Moghunter.ahud_tp_over + 0.5 );
+		var a_mtp = Math.floor( this._battler.mtp/Moghunter.ahud_tp_over + 0.5 );
+		if (this._tp_icon_old[0] != a_tp || this._tp_icon_old[1] != a_mtp) {
+		    this._tp_icon_old[0] = a_tp;
+			this._tp_icon_old[1] = a_mtp;
+			this.refresh_icons(this._tp_iconsB,this._tp_icon_img, a_tp, a_mtp,0);
+	        this.refresh_icons(this._tp_icons,this._tp_icon_img, a_tp, a_mtp,1);
 		};
 		if (this._tp_IconZoomAnime) {this.updateIconZoomAnime(this._tp_icons)};
     };	
@@ -2302,11 +2907,13 @@ if (String(Moghunter.ahud_exp_meter_visible) != "true") {return};
 	this._exp_meter.x = this._pos_x + Moghunter.ahud_exp_meter_pos_x;
 	this._exp_meter.y = this._pos_y + Moghunter.ahud_exp_meter_pos_y;
 	this._exp_meter.rotation = this._exp_meter.rotation * Math.PI / 180;
+
 	this.addChild(this._exp_meter);
 	if (String(Moghunter.ahud_exp_meter_flow) === "true") {this._exp_flow[0] = true;
 	    this._exp_flow[2] = this._exp_meter_img.width / 3;
 		this._exp_flow[3] = this._exp_flow[2] * 2;
 		this._exp_flow[1] = Math.floor(Math.random() * this._exp_flow[2]);
+
 	};
 	this._exp_meter.setFrame(0,0,0,0);
 };
@@ -2325,7 +2932,7 @@ Actor_Hud.prototype.create_level_number = function() {
 						  this._pos_x + Moghunter.ahud_level_number_pos_x,
 						  this._pos_y + Moghunter.ahud_level_number_pos_y,
 						  ];
-	for (var i = 0; i < 3; i++) {
+	for (var i = 0; i < Moghunter.ahud_max_lv_limit; i++) {
 	   this._level_number[i] = new Sprite(this._level_number_img);
 	   this._level_number[i].visible = false;
 	   this._level_number[i].x = this._level_img_data[4];
@@ -2341,6 +2948,7 @@ Actor_Hud.prototype.create_level_number = function() {
 //==============================
 Actor_Hud.prototype.update_exp = function() {
 	if (this._exp_meter) {
+		this._exp_meter.opacity += 15; 
 		if (this.need_refresh_parameter(3)) {
 			if (this._battler.isMaxLevel()) {
 			    this.refresh_meter(this._exp_meter,1,1,0,1,1);
@@ -2395,6 +3003,7 @@ Actor_Hud.prototype.refresh_states = function() {
 	   };
 	this._states_data[1] += 1;
 	if (this._states_data[1] >= this._battler.allIcons().length) {
+
 		this._states_data[1] = 0
 	};
 };
