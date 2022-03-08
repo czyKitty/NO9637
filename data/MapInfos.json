@@ -1,7 +1,7 @@
 [
 null,
 {"id":1,"expanded":true,"name":"黑崎宅","order":1,"parentId":0,"scrollX":970.8,"scrollY":524.4},
-{"id":2,"expanded":true,"name":"玄关","order":2,"parentId":1,"scrollX":970.8,"scrollY":524.4},
+{"id":2,"expanded":true,"name":"玄关","order":2,"parentId":1,"scrollX":1139,"scrollY":640},
 {"id":3,"expanded":false,"name":"会客室","order":3,"parentId":1,"scrollX":819,"scrollY":460},
 {"id":4,"expanded":false,"name":"餐厅","order":4,"parentId":3,"scrollX":819,"scrollY":460},
 {"id":5,"expanded":true,"name":"左玄关","order":5,"parentId":3,"scrollX":819,"scrollY":460},
